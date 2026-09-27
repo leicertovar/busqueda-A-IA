@@ -31,7 +31,7 @@ ITERACIÓN 1: Se expande (0,0) (f=14)
 ------------------------------------------------------------------------------
 ITERACIÓN 2: Se expande (1,0) (f=14)
   Nodo extraído: (1,0)  g=1  h=13  f=14  padre=(0,0)
-    · arriba    (0,0) coste= 0                     -> En lista cerrada - se omite
+    · arriba    (0,0) coste= 1                     -> En lista cerrada - se omite
     · abajo     (2,0) coste= 2 g=3 h=12 f=15       -> NUEVO - se inserta en lista abierta
     · derecha   (1,1) coste= ∞                     -> BLOQUEADO (X) - se omite
   LISTA ABIERTA (2), ordenada por f, h, antigüedad:
@@ -43,7 +43,7 @@ ITERACIÓN 2: Se expande (1,0) (f=14)
 ITERACIÓN 3: Se expande (0,1) (f=14)
   Nodo extraído: (0,1)  g=1  h=13  f=14  padre=(0,0)
     · abajo     (1,1) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · izquierda (0,0) coste= 0                     -> En lista cerrada - se omite
+    · izquierda (0,0) coste= 1                     -> En lista cerrada - se omite
     · derecha   (0,2) coste= 2 g=3 h=12 f=15       -> NUEVO - se inserta en lista abierta
   LISTA ABIERTA (2), ordenada por f, h, antigüedad:
       (2,0)  g= 3  h=12  f=15  padre=(1,0)
@@ -310,8 +310,9 @@ ITERACIÓN 20: Se expande (7,6) (f=17)
   Nodo extraído: (7,6)  g=16  h=1  f=17  padre=(7,5)
     · arriba    (6,6) coste= ∞                     -> BLOQUEADO (X) - se omite
     · izquierda (7,5) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (7,7) coste= 7 g=23 h=0 f=23       -> NUEVO - se inserta en lista abierta
+    · derecha   (7,7) coste= 1 g=17 h=0 f=17       -> NUEVO - se inserta en lista abierta
   LISTA ABIERTA (9), ordenada por f, h, antigüedad:
+      (7,7)  g=17  h= 0  f=17  padre=(7,6)
       (2,5)  g=11  h= 7  f=18  padre=(2,4)
       (4,0)  g= 8  h=10  f=18  padre=(3,0)
       (0,3)  g= 7  h=11  f=18  padre=(0,2)
@@ -319,485 +320,30 @@ ITERACIÓN 20: Se expande (7,6) (f=17)
       (6,5)  g=17  h= 3  f=20  padre=(7,5)
       (1,3)  g=11  h=10  f=21  padre=(1,2)
       (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
       (7,2)  g=20  h= 5  f=25  padre=(7,3)
   LISTA CERRADA (20): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6)
   Nodos creados=29  expandidos=20  actualizados=0
 ------------------------------------------------------------------------------
-ITERACIÓN 21: Se expande (2,5) (f=18)
-  Nodo extraído: (2,5)  g=11  h=7  f=18  padre=(2,4)
-    · arriba    (1,5) coste= 2 g=13 h=8 f=21       -> NUEVO - se inserta en lista abierta
-    · abajo     (3,5) coste= 1 g=12 h=6 f=18       -> NUEVO - se inserta en lista abierta
-    · izquierda (2,4) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (2,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (10), ordenada por f, h, antigüedad:
-      (3,5)  g=12  h= 6  f=18  padre=(2,5)
-      (4,0)  g= 8  h=10  f=18  padre=(3,0)
-      (0,3)  g= 7  h=11  f=18  padre=(0,2)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (21): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5)
-  Nodos creados=31  expandidos=21  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 22: Se expande (3,5) (f=18)
-  Nodo extraído: (3,5)  g=12  h=6  f=18  padre=(2,5)
-    · arriba    (2,5) coste= 4                     -> En lista cerrada - se omite
-    · abajo     (4,5) coste= 2 g=14 h=5 f=19       -> NUEVO - se inserta en lista abierta
-    · izquierda (3,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · derecha   (3,6) coste= 1 g=13 h=5 f=18       -> NUEVO - se inserta en lista abierta
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (3,6)  g=13  h= 5  f=18  padre=(3,5)
-      (4,0)  g= 8  h=10  f=18  padre=(3,0)
-      (0,3)  g= 7  h=11  f=18  padre=(0,2)
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (22): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5)
-  Nodos creados=33  expandidos=22  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 23: Se expande (3,6) (f=18)
-  Nodo extraído: (3,6)  g=13  h=5  f=18  padre=(3,5)
-    · arriba    (2,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · abajo     (4,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · izquierda (3,5) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (3,7) coste= 2 g=15 h=4 f=19       -> NUEVO - se inserta en lista abierta
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (4,0)  g= 8  h=10  f=18  padre=(3,0)
-      (0,3)  g= 7  h=11  f=18  padre=(0,2)
-      (3,7)  g=15  h= 4  f=19  padre=(3,6)
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (23): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6)
-  Nodos creados=34  expandidos=23  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 24: Se expande (4,0) (f=18)
-  Nodo extraído: (4,0)  g=8  h=10  f=18  padre=(3,0)
-    · arriba    (3,0) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (5,0) coste= 1 g=9 h=9 f=18        -> NUEVO - se inserta en lista abierta
-    · derecha   (4,1) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (5,0)  g= 9  h= 9  f=18  padre=(4,0)
-      (0,3)  g= 7  h=11  f=18  padre=(0,2)
-      (3,7)  g=15  h= 4  f=19  padre=(3,6)
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (24): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0)
-  Nodos creados=35  expandidos=24  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 25: Se expande (5,0) (f=18)
-  Nodo extraído: (5,0)  g=9  h=9  f=18  padre=(4,0)
-    · arriba    (4,0) coste= 4                     -> En lista cerrada - se omite
-    · abajo     (6,0) coste= 2 g=11 h=8 f=19       -> NUEVO - se inserta en lista abierta
-    · derecha   (5,1) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (0,3)  g= 7  h=11  f=18  padre=(0,2)
-      (3,7)  g=15  h= 4  f=19  padre=(3,6)
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (25): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0)
-  Nodos creados=36  expandidos=25  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 26: Se expande (0,3) (f=18)
-  Nodo extraído: (0,3)  g=7  h=11  f=18  padre=(0,2)
-    · abajo     (1,3) coste= 7 g=14 h=10 f=24      -> Ya en lista abierta con g=11 <= 14 - sin cambios
-    · izquierda (0,2) coste= 2                     -> En lista cerrada - se omite
-    · derecha   (0,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (10), ordenada por f, h, antigüedad:
-      (3,7)  g=15  h= 4  f=19  padre=(3,6)
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (26): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3)
-  Nodos creados=36  expandidos=26  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 27: Se expande (3,7) (f=19)
-  Nodo extraído: (3,7)  g=15  h=4  f=19  padre=(3,6)
-    · arriba    (2,7) coste= 1 g=16 h=5 f=21       -> NUEVO - se inserta en lista abierta
-    · abajo     (4,7) coste= 4 g=19 h=3 f=22       -> NUEVO - se inserta en lista abierta
-    · izquierda (3,6) coste= 1                     -> En lista cerrada - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (4,5)  g=14  h= 5  f=19  padre=(3,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (27): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7)
-  Nodos creados=38  expandidos=27  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 28: Se expande (4,5) (f=19)
-  Nodo extraído: (4,5)  g=14  h=5  f=19  padre=(3,5)
-    · arriba    (3,5) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (5,5) coste= 1 g=15 h=4 f=19       -> NUEVO - se inserta en lista abierta
-    · izquierda (4,4) coste= 1 g=15 h=6 f=21       -> NUEVO - se inserta en lista abierta
-    · derecha   (4,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (12), ordenada por f, h, antigüedad:
-      (5,5)  g=15  h= 4  f=19  padre=(4,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (28): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5)
-  Nodos creados=40  expandidos=28  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 29: Se expande (5,5) (f=19)
-  Nodo extraído: (5,5)  g=15  h=4  f=19  padre=(4,5)
-    · arriba    (4,5) coste= 2                     -> En lista cerrada - se omite
-    · abajo     (6,5) coste= 2 g=17 h=3 f=20       -> Ya en lista abierta con g=17 <= 17 - sin cambios
-    · izquierda (5,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · derecha   (5,6) coste= 1 g=16 h=3 f=19       -> NUEVO - se inserta en lista abierta
-  LISTA ABIERTA (12), ordenada por f, h, antigüedad:
-      (5,6)  g=16  h= 3  f=19  padre=(5,5)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (29): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5)
-  Nodos creados=41  expandidos=29  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 30: Se expande (5,6) (f=19)
-  Nodo extraído: (5,6)  g=16  h=3  f=19  padre=(5,5)
-    · arriba    (4,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · abajo     (6,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · izquierda (5,5) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (5,7) coste= 1 g=17 h=2 f=19       -> NUEVO - se inserta en lista abierta
-  LISTA ABIERTA (12), ordenada por f, h, antigüedad:
-      (5,7)  g=17  h= 2  f=19  padre=(5,6)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (30): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6)
-  Nodos creados=42  expandidos=30  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 31: Se expande (5,7) (f=19)
-  Nodo extraído: (5,7)  g=17  h=2  f=19  padre=(5,6)
-    · arriba    (4,7) coste= 4 g=21 h=3 f=24       -> Ya en lista abierta con g=19 <= 21 - sin cambios
-    · abajo     (6,7) coste= 1 g=18 h=1 f=19       -> NUEVO - se inserta en lista abierta
-    · izquierda (5,6) coste= 1                     -> En lista cerrada - se omite
-  LISTA ABIERTA (12), ordenada por f, h, antigüedad:
-      (6,7)  g=18  h= 1  f=19  padre=(5,7)
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (31): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7)
-  Nodos creados=43  expandidos=31  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 32: Se expande (6,7) (f=19)
-  Nodo extraído: (6,7)  g=18  h=1  f=19  padre=(5,7)
-    · arriba    (5,7) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (7,7) coste= 7 g=25 h=0 f=25       -> Ya en lista abierta con g=23 <= 25 - sin cambios
-    · izquierda (6,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (6,2)  g=13  h= 6  f=19  padre=(5,2)
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (32): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7)
-  Nodos creados=43  expandidos=32  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 33: Se expande (6,2) (f=19)
-  Nodo extraído: (6,2)  g=13  h=6  f=19  padre=(5,2)
-    · arriba    (5,2) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (7,2) coste= 7 g=20 h=5 f=25       -> Ya en lista abierta con g=20 <= 20 - sin cambios
-    · izquierda (6,1) coste= 1 g=14 h=7 f=21       -> NUEVO - se inserta en lista abierta
-    · derecha   (6,3) coste= 1                     -> En lista cerrada - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (6,0)  g=11  h= 8  f=19  padre=(5,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (6,1)  g=14  h= 7  f=21  padre=(6,2)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (33): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2)
-  Nodos creados=44  expandidos=33  actualizados=0
-------------------------------------------------------------------------------
-ITERACIÓN 34: Se expande (6,0) (f=19)
-  Nodo extraído: (6,0)  g=11  h=8  f=19  padre=(5,0)
-    · arriba    (5,0) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (7,0) coste= 1 g=12 h=7 f=19       -> NUEVO - se inserta en lista abierta
-    · derecha   (6,1) coste= 1 g=12 h=7 f=19       -> MEJOR CAMINO - g baja de 14 a 12, nuevo padre
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (6,1)  g=12  h= 7  f=19  padre=(6,0)
-      (7,0)  g=12  h= 7  f=19  padre=(6,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (34): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0)
-  Nodos creados=45  expandidos=34  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 35: Se expande (6,1) (f=19)
-  Nodo extraído: (6,1)  g=12  h=7  f=19  padre=(6,0)
-    · arriba    (5,1) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · abajo     (7,1) coste= 1 g=13 h=6 f=19       -> NUEVO - se inserta en lista abierta
-    · izquierda (6,0) coste= 2                     -> En lista cerrada - se omite
-    · derecha   (6,2) coste= 4                     -> En lista cerrada - se omite
-  LISTA ABIERTA (11), ordenada por f, h, antigüedad:
-      (7,1)  g=13  h= 6  f=19  padre=(6,1)
-      (7,0)  g=12  h= 7  f=19  padre=(6,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (35): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1)
-  Nodos creados=46  expandidos=35  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 36: Se expande (7,1) (f=19)
-  Nodo extraído: (7,1)  g=13  h=6  f=19  padre=(6,1)
-    · arriba    (6,1) coste= 1                     -> En lista cerrada - se omite
-    · izquierda (7,0) coste= 1 g=14 h=7 f=21       -> Ya en lista abierta con g=12 <= 14 - sin cambios
-    · derecha   (7,2) coste= 7 g=20 h=5 f=25       -> Ya en lista abierta con g=20 <= 20 - sin cambios
-  LISTA ABIERTA (10), ordenada por f, h, antigüedad:
-      (7,0)  g=12  h= 7  f=19  padre=(6,0)
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (36): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1)
-  Nodos creados=46  expandidos=36  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 37: Se expande (7,0) (f=19)
-  Nodo extraído: (7,0)  g=12  h=7  f=19  padre=(6,0)
-    · arriba    (6,0) coste= 2                     -> En lista cerrada - se omite
-    · derecha   (7,1) coste= 1                     -> En lista cerrada - se omite
-  LISTA ABIERTA (9), ordenada por f, h, antigüedad:
-      (6,5)  g=17  h= 3  f=20  padre=(7,5)
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (37): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0)
-  Nodos creados=46  expandidos=37  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 38: Se expande (6,5) (f=20)
-  Nodo extraído: (6,5)  g=17  h=3  f=20  padre=(7,5)
-    · arriba    (5,5) coste= 1                     -> En lista cerrada - se omite
-    · abajo     (7,5) coste= 1                     -> En lista cerrada - se omite
-    · izquierda (6,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · derecha   (6,6) coste= ∞                     -> BLOQUEADO (X) - se omite
+ITERACIÓN 21: La meta (7,7) fue extraída de la lista abierta con f=17. FIN: se reconstruye el camino.
+  Nodo extraído: (7,7)  g=17  h=0  f=17  padre=(7,6)
   LISTA ABIERTA (8), ordenada por f, h, antigüedad:
-      (2,7)  g=16  h= 5  f=21  padre=(3,7)
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
+      (2,5)  g=11  h= 7  f=18  padre=(2,4)
+      (4,0)  g= 8  h=10  f=18  padre=(3,0)
+      (0,3)  g= 7  h=11  f=18  padre=(0,2)
+      (6,2)  g=13  h= 6  f=19  padre=(5,2)
+      (6,5)  g=17  h= 3  f=20  padre=(7,5)
       (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
       (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
       (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (38): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5)
-  Nodos creados=46  expandidos=38  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 39: Se expande (2,7) (f=21)
-  Nodo extraído: (2,7)  g=16  h=5  f=21  padre=(3,7)
-    · arriba    (1,7) coste= 1 g=17 h=6 f=23       -> NUEVO - se inserta en lista abierta
-    · abajo     (3,7) coste= 2                     -> En lista cerrada - se omite
-    · izquierda (2,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (8), ordenada por f, h, antigüedad:
-      (4,4)  g=15  h= 6  f=21  padre=(4,5)
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (39): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7)
-  Nodos creados=47  expandidos=39  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 40: Se expande (4,4) (f=21)
-  Nodo extraído: (4,4)  g=15  h=6  f=21  padre=(4,5)
-    · arriba    (3,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · abajo     (5,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · izquierda (4,3) coste= 7 g=22 h=7 f=29       -> Ya en lista abierta con g=15 <= 22 - sin cambios
-    · derecha   (4,5) coste= 2                     -> En lista cerrada - se omite
-  LISTA ABIERTA (7), ordenada por f, h, antigüedad:
-      (1,5)  g=13  h= 8  f=21  padre=(2,5)
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (40): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4)
-  Nodos creados=47  expandidos=40  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 41: Se expande (1,5) (f=21)
-  Nodo extraído: (1,5)  g=13  h=8  f=21  padre=(2,5)
-    · arriba    (0,5) coste= 1 g=14 h=9 f=23       -> NUEVO - se inserta en lista abierta
-    · abajo     (2,5) coste= 4                     -> En lista cerrada - se omite
-    · izquierda (1,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · derecha   (1,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (7), ordenada por f, h, antigüedad:
-      (1,3)  g=11  h=10  f=21  padre=(1,2)
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (0,5)  g=14  h= 9  f=23  padre=(1,5)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (41): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4) (1,5)
-  Nodos creados=48  expandidos=41  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 42: Se expande (1,3) (f=21)
-  Nodo extraído: (1,3)  g=11  h=10  f=21  padre=(1,2)
-    · arriba    (0,3) coste= 4                     -> En lista cerrada - se omite
-    · abajo     (2,3) coste= 1                     -> En lista cerrada - se omite
-    · izquierda (1,2) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (1,4) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (6), ordenada por f, h, antigüedad:
-      (4,7)  g=19  h= 3  f=22  padre=(3,7)
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (0,5)  g=14  h= 9  f=23  padre=(1,5)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (42): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4) (1,5) (1,3)
-  Nodos creados=48  expandidos=42  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 43: Se expande (4,7) (f=22)
-  Nodo extraído: (4,7)  g=19  h=3  f=22  padre=(3,7)
-    · arriba    (3,7) coste= 2                     -> En lista cerrada - se omite
-    · abajo     (5,7) coste= 1                     -> En lista cerrada - se omite
-    · izquierda (4,6) coste= ∞                     -> BLOQUEADO (X) - se omite
-  LISTA ABIERTA (5), ordenada por f, h, antigüedad:
-      (4,3)  g=15  h= 7  f=22  padre=(4,2)
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (0,5)  g=14  h= 9  f=23  padre=(1,5)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (43): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4) (1,5) (1,3) (4,7)
-  Nodos creados=48  expandidos=43  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 44: Se expande (4,3) (f=22)
-  Nodo extraído: (4,3)  g=15  h=7  f=22  padre=(4,2)
-    · arriba    (3,3) coste= ∞                     -> BLOQUEADO (X) - se omite
-    · abajo     (5,3) coste= 1                     -> En lista cerrada - se omite
-    · izquierda (4,2) coste= 1                     -> En lista cerrada - se omite
-    · derecha   (4,4) coste= 1                     -> En lista cerrada - se omite
-  LISTA ABIERTA (4), ordenada por f, h, antigüedad:
-      (7,7)  g=23  h= 0  f=23  padre=(7,6)
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (0,5)  g=14  h= 9  f=23  padre=(1,5)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (44): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4) (1,5) (1,3) (4,7) (4,3)
-  Nodos creados=48  expandidos=44  actualizados=1
-------------------------------------------------------------------------------
-ITERACIÓN 45: La meta (7,7) fue extraída de la lista abierta con f=23. FIN: se reconstruye el camino.
-  Nodo extraído: (7,7)  g=23  h=0  f=23  padre=(7,6)
-  LISTA ABIERTA (3), ordenada por f, h, antigüedad:
-      (1,7)  g=17  h= 6  f=23  padre=(2,7)
-      (0,5)  g=14  h= 9  f=23  padre=(1,5)
-      (7,2)  g=20  h= 5  f=25  padre=(7,3)
-  LISTA CERRADA (45): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (2,5) (3,5) (3,6) (4,0) (5,0) (0,3) (3,7) (4,5) (5,5) (5,6) (5,7) (6,7) (6,2) (6,0) (6,1) (7,1) (7,0) (6,5) (2,7) (4,4) (1,5) (1,3) (4,7) (4,3) (7,7)
-  Nodos creados=48  expandidos=44  actualizados=1
+  LISTA CERRADA (21): (0,0) (1,0) (0,1) (2,0) (3,0) (0,2) (1,2) (2,2) (2,3) (2,4) (3,2) (4,2) (5,2) (5,3) (6,3) (3,1) (7,3) (7,4) (7,5) (7,6) (7,7)
+  Nodos creados=29  expandidos=20  actualizados=0
 ==============================================================================
 RUTA ÓPTIMA ENCONTRADA
   (0,0) -> (0,1) -> (0,2) -> (1,2) -> (2,2) -> (3,2) -> (4,2) -> (5,2) -> (5,3) -> (6,3) -> (7,3) -> (7,4) -> (7,5) -> (7,6) -> (7,7)
-  Coste total g(meta) = 23
+  Coste total g(meta) = 17
   Número de movimientos = 14
-  Desglose: (0,1):+1=1, (0,2):+2=3, (1,2):+1=4, (2,2):+1=5, (3,2):+2=7, (4,2):+1=8, (5,2):+1=9, (5,3):+1=10, (6,3):+1=11, (7,3):+2=13, (7,4):+1=14, (7,5):+1=15, (7,6):+1=16, (7,7):+7=23
-  Iteraciones=45  Nodos creados=48  Nodos expandidos=44  Actualizaciones=1
+  Desglose: (0,1):+1=1, (0,2):+2=3, (1,2):+1=4, (2,2):+1=5, (3,2):+2=7, (4,2):+1=8, (5,2):+1=9, (5,3):+1=10, (6,3):+1=11, (7,3):+2=13, (7,4):+1=14, (7,5):+1=15, (7,6):+1=16, (7,7):+1=17
+  Iteraciones=21  Nodos creados=29  Nodos expandidos=20  Actualizaciones=0
 ==============================================================================
 Heurística admisible (h(n) <= h*(n) en todas las casillas): True
 Heurística consistente (h(n) <= c(n,n') + h(n')):          True

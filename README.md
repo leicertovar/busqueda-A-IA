@@ -31,10 +31,11 @@ python main.py --solo-visor   # solo abre el visor interactivo paso a paso
 
 ### Resultado obtenido
 - Ruta: (0,0) → (0,1) → (0,2) → (1,2) → (2,2) → (3,2) → (4,2) → (5,2) → (5,3) → (6,3) → (7,3) → (7,4) → (7,5) → (7,6) → (7,7)
-- Coste total: **23** · 14 movimientos · 45 iteraciones · 48 nodos creados · 44 nodos expandidos
+- Coste total: **17** · 14 movimientos · 21 iteraciones · 29 nodos creados · 20 nodos expandidos
 
 ### Convenciones
-- Mover a una casilla cuesta el peso de esa casilla (1, 2, 4, 7; X = ∞). B = 0, S = 7 (como en el enunciado).
+- Mover a una casilla cuesta el peso de esa casilla (1, 2, 4, 7; X = ∞). B = 1 y S = 1
+  (aclaración del profesor: se toman como puntos de valor 1; conservan su identificación visual B y S).
 - Vecinos en el orden: arriba, abajo, izquierda, derecha.
 - Desempate en la lista abierta: menor f → menor h → el creado primero.
 - La búsqueda termina cuando la meta (7,7) es **extraída** de la lista abierta.

@@ -11,7 +11,8 @@ Si el grupo tiene menos integrantes, repartir los bloques.
 1. Presentación del grupo y del proyecto: A* para rescate post-terremoto.
 2. El escenario: matriz 8 × 8, Bombero en (0,0), Superviviente en (7,7).
 3. Los costes: 1 libre, 2 escombros, 4 grietas/humo, 7 fuego/agua, X bloqueado (∞).
-4. Convención: moverse a una casilla cuesta su peso; B = 0 y S = 7.
+4. Convención: moverse a una casilla cuesta su peso; B y S valen 1 (aclaración del profesor:
+   los valores altos son penalizaciones para evitar tránsitos, así que B y S son puntos de valor 1).
 5. Movimiento en 4 direcciones: arriba, abajo, izquierda, derecha.
 
 ## Integrante 2 – El algoritmo A* y el código (2:20 – 4:40)
@@ -29,15 +30,15 @@ Si el grupo tiene menos integrantes, repartir los bloques.
 2. Admisibilidad: cada paso reduce h como máximo en 1 y cuesta al menos 1 ⇒ h(n) ≤ h*(n).
 3. Consistencia: h(n) ≤ c(n,n') + h(n'), por eso no hace falta reabrir la lista cerrada.
 4. Verificación: el programa compara h con el coste real h* en las 50 casillas transitables (todas ≥ 0).
-5. Comparación con h = 0: mismo coste 23, pero A* expande 44 nodos en lugar de 49.
+5. Comparación con h = 0: mismo coste 17, pero A* expande solo 20 nodos en lugar de 46.
 
 ## Integrante 4 – Demostración y resultados (7:00 – 9:30)
 *En pantalla: `python main.py` y el visor interactivo.*
 1. Ejecutar el programa y mostrar la traza en consola.
 2. En el visor avanzar iteración por iteración: lista abierta (azul), lista cerrada (gris, #orden),
    nodo actual (magenta), nodos creados y expandidos.
-3. Mostrar la iteración donde se actualiza un g (camino más barato encontrado).
+3. Mostrar cómo reacciona cada vecino: nuevo (azul), bloqueado (rojo), ya cerrado (gris).
 4. Mostrar el espacio de búsqueda (`03_espacio_busqueda.png`) y la ruta final:
-   coste 23, 14 movimientos, 48 nodos creados, 44 expandidos.
+   coste 17, 14 movimientos, 29 nodos creados, 20 expandidos.
 5. Conclusión: A* balanceó entre atravesar escombros (coste 2) y evitar humo y fuego (4 y 7).
    Cierre del grupo.

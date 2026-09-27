@@ -46,9 +46,9 @@ def _color(valor):
 
 def _etiqueta(valor):
     if valor == "B":
-        return "B (0)"
+        return "B (1)"
     if valor == "S":
-        return "S (7)"
+        return "S (1)"
     return str(valor)
 
 
@@ -390,6 +390,9 @@ def generar_todas_las_figuras(resultado: Resultado, carpeta="resultados", log=pr
     os.makedirs(carpeta, exist_ok=True)
     carpeta_it = os.path.join(carpeta, "iteraciones")
     os.makedirs(carpeta_it, exist_ok=True)
+    for viejo in os.listdir(carpeta_it):          # imágenes de ejecuciones anteriores
+        if viejo.startswith("iteracion_") and viejo.endswith(".png"):
+            os.remove(os.path.join(carpeta_it, viejo))
 
     figura_tablero_inicial(os.path.join(carpeta, "01_tablero_inicial.png"))
     figura_ruta_optima(resultado, os.path.join(carpeta, "02_ruta_optima.png"))

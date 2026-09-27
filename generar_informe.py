@@ -172,7 +172,7 @@ def _tabla_tablero():
            "B": "#22c55e", "S": "#ef4444"}
     datos = [["F \\ C"] + [str(c) for c in range(8)]]
     for f, fila in enumerate(TABLERO):
-        datos.append([str(f)] + [{"B": "B (0)", "S": "S (7)"}.get(v, str(v)) for v in fila])
+        datos.append([str(f)] + [{"B": "B (1)", "S": "S (1)"}.get(v, str(v)) for v in fila])
     t = Table(datos, colWidths=[1.5 * cm] + [1.6 * cm] * 8, rowHeights=0.75 * cm)
     cmds = [("GRID", (0, 0), (-1, -1), 0.6, BORDE),
             ("FONTNAME", (0, 0), (-1, -1), NEGRITA), ("FONTSIZE", (0, 0), (-1, -1), 10),
@@ -209,7 +209,8 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
     img = lambda n: os.path.join(carpeta, n)
     img_it = lambda k: os.path.join(carpeta, "iteraciones", f"iteracion_{k:02d}.png")
 
-    doc = SimpleDocTemplate(ruta_pdf, pagesize=A4, leftMargin=2 * cm, rightMargin=2 * cm,
+    ruta_tmp = ruta_pdf + ".tmp"   # se genera aparte y luego reemplaza al PDF final
+    doc = SimpleDocTemplate(ruta_tmp, pagesize=A4, leftMargin=2 * cm, rightMargin=2 * cm,
                             topMargin=1.8 * cm, bottomMargin=1.8 * cm,
                             title="Proyecto A* – Rescate post-terremoto",
                             author=", ".join(INTEGRANTES))
@@ -285,15 +286,21 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
               "Zonas peligrosas que exigen un esfuerzo y tiempo considerable para ser atravesadas."]]
     H.append(tabla(datos, [5.3 * cm, 1.4 * cm, ancho_util - 6.7 * cm], tam=9))
     H += [Spacer(1, 10), KeepTogether([
-          P("<b>Matriz de terreno y ponderación de costes (idéntica al enunciado):</b>"),
+          P("<b>Matriz de terreno y ponderación de costes</b> (la del enunciado, con B y S de valor 1 según "
+            "la aclaración del profesor):"),
           _tabla_tablero(), Spacer(1, 4),
-          P("B: Bombero (0,0) · S: Superviviente (7,7) · X: Bloqueado (∞) · 1: Libre · "
+          P("B: Bombero (0,0), valor 1 · S: Superviviente (7,7), valor 1 · X: Bloqueado (∞) · 1: Libre · "
             "2: Escombros leves · 4: Grietas / Humo · 7: Fuego parcial / Agua acumulada", "pie")]),
           P("<b>Convención de coste de movimiento.</b> Moverse de una casilla a una vecina cuesta el "
             "<b>peso de la casilla a la que se entra</b>. Así, g(n) acumula los pesos de todas las "
-            "casillas atravesadas después de la inicial. La casilla del Bombero tiene coste 0 (B (0)), "
-            "pues es donde ya se encuentra, y la del Superviviente tiene coste 7 (S (7)), tal como indica "
-            "el tablero del enunciado. Las casillas X tienen coste ∞ y nunca se generan como sucesores.")]
+            "casillas atravesadas después de la inicial. Por aclaración del profesor, la casilla del Bombero "
+            "B (0,0) y la del Superviviente S (7,7) se toman como puntos de <b>valor 1</b> (B (1) y S (1)): "
+            "conservan su identificación como B y S, pero cuestan lo mismo que una casilla libre. Esto no "
+            "altera la solución, porque los valores altos (2, 4 y 7) se usan como penalización para evitar "
+            "determinados tránsitos, y cualquier ruta debe entrar a S exactamente una vez. Como el algoritmo "
+            "parte de B con g(0,0) = 0, el valor de B solo se usaría si se volviera a entrar en ella, lo cual "
+            "nunca ocurre porque queda en la lista cerrada. Las casillas X tienen coste ∞ y nunca se generan "
+            "como sucesores.")]
 
     # ----------------------------------------------------------- 3
     H += [P("3. Modelado del problema de búsqueda", "h1"),
@@ -304,7 +311,7 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
              ["Acciones", "Moverse a una de las 4 casillas contiguas, en este orden: arriba (F−1), abajo "
                           "(F+1), izquierda (C−1), derecha (C+1). Sin movimientos diagonales."],
              ["Restricciones", "No se puede salir del tablero ni entrar en casillas X (coste ∞)."],
-             ["Coste de paso c(n, n')", "Peso de la casilla destino n': 1, 2, 4 o 7 (7 al entrar en S)."],
+             ["Coste de paso c(n, n')", "Peso de la casilla destino n': 1, 2, 4 o 7 (B y S valen 1)."],
              ["Test de meta", "La casilla (7,7) (Superviviente) es extraída de la lista abierta."],
              ["Coste del camino", "Suma de los costes de paso: g(meta)."],
              ["Heurística", "h(n) = |F<sub>n</sub> − 7| + |C<sub>n</sub> − 7| (Distancia de Manhattan)."]]
@@ -361,7 +368,9 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
 
     # ----------------------------------------------------------- 5
     n_celdas = len(tabla_h)
-    min_diff = min(hs - h for _, h, hs, _ in tabla_h if _ != META) if tabla_h else 0
+    min_diff = min(hs - h for pos, h, hs, _ in tabla_h if pos != META) if tabla_h else 0
+    max_diff = max(hs - h for _, h, hs, _ in tabla_h) if tabla_h else 0
+    n_exactas = sum(1 for pos, h, hs, _ in tabla_h if hs == h and pos != META)
     H += [PageBreak(), P("5. La heurística: por qué funciona y por qué es admisible", "h1"),
           P("5.1 ¿Por qué funciona la Distancia de Manhattan?", "h2"),
           P("El bombero solo puede moverse en 4 direcciones (arriba, abajo, izquierda, derecha). Cada "
@@ -410,11 +419,12 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
           imagen(img("05_admisibilidad_heuristica.png"), ancho_util / cm),
           P("Figura 1. Izquierda: h(n). Centro: coste real óptimo h*(n). Derecha: h*(n) − h(n) ≥ 0 en todas "
             "las casillas, lo que confirma la admisibilidad.", "pie"),
-          P("<b>Observación.</b> La diferencia h* − h es grande (entre 6 y 12 en la mayoría de casillas) porque "
-            "Manhattan supone que todo el recorrido es libre (coste 1) y sin obstáculos, mientras que el "
-            "tablero tiene muros X y casillas de coste 2, 4 y 7; en particular, entrar al Superviviente ya "
-            "cuesta 7. Esto hace que la heurística sea conservadora: garantiza la ruta óptima a cambio de "
-            "explorar una parte importante del tablero (ver Sección 7.3).")]
+          P(f"<b>Observación.</b> La diferencia h* − h va de 0 a {formato_num(max_diff)}. En {n_exactas} casillas "
+            "es 0: allí la heurística coincide con el coste real, porque existe un camino directo hacia la meta "
+            "formado solo por casillas de valor 1. En las demás, Manhattan subestima porque supone que no hay "
+            "muros X ni casillas de coste 2, 4 o 7 que obliguen a rodear o a pagar más. Al estar tan cerca "
+            "del coste real sin superarlo nunca, la heurística es admisible y además muy informada: guía la "
+            "búsqueda casi directamente hacia el superviviente (ver Sección 7.3).")]
 
     # ----------------------------------------------------------- 6
     H += [PageBreak(), P("6. Ejecución paso a paso", "h1"),
@@ -513,9 +523,8 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
             "(3,2) y (7,3) porque rodearlas resultaba más caro, y <b>evitó</b> las casillas de coste 4 y 7 "
             "cercanas al camino, como (0,3), (1,3), (4,3), (6,2) y (7,2), rodeándolas por vías libres. "
             "La mejor alternativa por el lado derecho del tablero, …→(2,4)→(2,5)→(3,5)→(4,5)→(5,5)→(5,6)→(5,7)"
-            "→(6,7)→(7,7), obliga a pasar por (2,5) con coste 4 y (4,5) con coste 2 y cuesta 25, por eso fue "
-            "descartada. El coste final incluye los 7 puntos de entrar a la casilla del Superviviente, que son "
-            "inevitables para cualquier ruta."),
+            "→(6,7)→(7,7), obliga a pasar por (2,5) con coste 4 y (4,5) con coste 2 y cuesta 19, por eso fue "
+            "descartada. El último paso, entrar a S (7,7), suma 1 porque la casilla del Superviviente vale 1."),
           imagen(img("02_ruta_optima.png"), 12.5),
           P("Figura 4. Ruta óptima sobre el tablero, con el g acumulado en cada casilla.", "pie"),
           P("7.2 Visualización del espacio de búsqueda", "h2"),
@@ -525,11 +534,12 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
             "nunca fueron alcanzadas por la búsqueda."),
           imagen(img("03_espacio_busqueda.png"), 12.5),
           P("Figura 5. Espacio de búsqueda explorado y orden de expansión.", "pie"),
-          P("Se observa que la búsqueda avanza primero por la zona izquierda y central (nodos 1 a 20), donde "
-            "f(n) es más bajo, llega hasta la fila 7 y solo después, cuando esos caminos dejan de ser los más "
-            "prometedores, abre la zona derecha del tablero. Las casillas (0,6) y (0,7) nunca se generaron: "
-            "sus vecinos (0,5) y (1,7) quedaron en la lista abierta con f = 23, igual que la meta, y la meta "
-            "(h = 0) se extrajo antes por el criterio de desempate, terminando la búsqueda."),
+          P("Se observa que la búsqueda es muy dirigida. Primero explora la esquina de salida (nodos 1 a 8), "
+            "donde varios caminos tienen f = 14 o f = 15; luego baja por la columna 2 (nodos 11 a 13), cruza a la "
+            "columna 3 y llega a la fila 7 (nodos 17 a 20), avanzando directamente hasta la meta, que es el "
+            "nodo 21. Toda la mitad derecha del tablero queda sin expandir: (2,5) llegó a la lista abierta con "
+            "f = 18, pero la meta salió antes con f = 17, así que la búsqueda terminó sin necesidad de "
+            "explorar esa zona."),
           P("7.3 Efecto de la heurística en la exploración", "h2"),
           P("Para evidenciar el aporte de h(n) se ejecutó el mismo algoritmo con h(n) = 0 (búsqueda de coste "
             "uniforme). Ambos encuentran el mismo coste óptimo, lo cual confirma de nuevo que Manhattan no "
@@ -542,10 +552,10 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
     H += [tabla(datos, [5 * cm, 5 * cm, 5 * cm], tam=9), Spacer(1, 6),
           imagen(img("04_comparacion_h0.png"), ancho_util / cm),
           P("Figura 6. Orden de expansión con Manhattan (izquierda) y sin heurística (derecha).", "pie"),
-          P("La mejora es moderada porque, como se explicó en la Sección 5.5, la heurística subestima bastante "
-            "el coste real en este tablero con muchos muros e impedimentos. Aun así, la heurística orienta la "
-            "búsqueda hacia el superviviente y evita expandir casillas que nunca podrían formar parte de una "
-            "ruta mejor.")]
+          P(f"La mejora es clara: sin heurística se expanden {res_h0.expandidos} nodos, prácticamente todo el "
+            f"tablero, mientras que A* con Manhattan solo expande {res.expandidos}. Como se vio en la Sección "
+            "5.5, la heurística está muy cerca del coste real sin superarlo nunca, así que orienta la búsqueda "
+            "hacia el superviviente y evita expandir casillas que no pueden formar parte de una ruta mejor.")]
 
     # ----------------------------------------------------------- 8
     H += [PageBreak(), P("8. Implementación en Python y visualización", "h1"),
@@ -587,8 +597,8 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
             "extraer la meta, el bombero recorre la ruta óptima y las celdas se tiñen de verde. Se controla con "
             "botones, una línea de tiempo, velocidad ajustable y teclado (← →, espacio, Inicio, Fin)."),
           *([imagen(img("interfaz_animada.png"), ancho_util / cm),
-             P("Figura 7. Interfaz animada durante la iteración 34: haces hacia los vecinos (azul = nuevo, "
-               "ámbar = mejora de g) y listas abierta y cerrada.", "pie")]
+             P("Figura 7. Interfaz animada durante la iteración 13: evaluación de los vecinos de (5,2) "
+               "(gris = ya en lista cerrada, azul = nuevo en lista abierta) y listas abierta y cerrada.", "pie")]
             if os.path.exists(img("interfaz_animada.png")) else []),
           imagen(img_it(res.iteraciones), ancho_util / cm),
           P(f"Figura 8. Última iteración ({res.iteraciones}): la meta (7,7) se extrae de la lista abierta y se "
@@ -625,6 +635,17 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
                           + " → ".join(formato_pos(p) for p in res.orden_expansion))]
 
     doc.build(H, onFirstPage=_pie_pagina, onLaterPages=_pie_pagina)
+    try:
+        os.replace(ruta_tmp, ruta_pdf)
+    except PermissionError:
+        # El PDF anterior está abierto en un visor (Windows bloquea el archivo):
+        # se guarda el informe nuevo con otro nombre en lugar de detener el programa.
+        base, ext = os.path.splitext(ruta_pdf)
+        ruta_pdf = f"{base}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}{ext}"
+        os.replace(ruta_tmp, ruta_pdf)
+        print(f"  AVISO: '{nombre}' está abierto en otro programa y no se pudo reemplazar.\n"
+              f"         Cierre ese PDF y vuelva a ejecutar para actualizarlo. Mientras tanto,\n"
+              f"         el informe nuevo se guardó como: {ruta_pdf}")
     return ruta_pdf
 
 

@@ -38,8 +38,10 @@ TABLERO = [
 INICIO = (0, 0)  # Bombero
 META = (7, 7)    # Superviviente
 
-COSTE_BOMBERO = 0      # B (0) en el enunciado
-COSTE_SUPERVIVIENTE = 7  # S (7) en el enunciado
+# Aclaración del profesor: B y S se toman como casillas de valor 1 (punto libre).
+# Los valores altos (2, 4, 7) son penalizaciones para evitar ciertos tránsitos.
+COSTE_BOMBERO = 1        # B (1)
+COSTE_SUPERVIVIENTE = 1  # S (1)
 
 DESCRIPCION_COSTES = {
     1: "Libre / Transitable",

@@ -501,7 +501,7 @@ class InterfazAEstrella:
                                                 state="hidden", tags=("anillo",))
                 d["flash"] = cv.create_polygon(self._rr(x1, y1, x2, y2, r), smooth=True, fill="",
                                                outline=ROJO, width=S(3), state="hidden", tags=("flash",))
-                etiqueta = {"B": "B · 0", "S": "S · 7"}.get(v, f"c={v}")
+                etiqueta = {"B": "B · 1", "S": "S · 1"}.get(v, f"c={v}")
                 d["t_coste"] = cv.create_text(x1 + 5, y1 + 4, text=etiqueta, anchor="nw",
                                               font=fuente_px(max(S(9), cs * 0.16), "bold"), tags=("texto",))
                 d["t_gh"] = cv.create_text((x1 + x2) / 2, y1 + cs * 0.55, text="",
