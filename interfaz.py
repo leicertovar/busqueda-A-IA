@@ -224,7 +224,7 @@ class InterfazAEstrella:
         self.ox, self.oy = S(28), S(24)
         # el tablero debe caber en el 60 % del ancho y en el alto disponible
         cs_ancho = (sw * 0.60 - S(60) - self.ox) / 8 - self.gap
-        cs_alto = (sh - S(320) - self.oy) / 8 - self.gap
+        cs_alto = (sh - S(245) - self.oy) / 8 - self.gap
         self.cs = int(max(S(46), min(cs_ancho, cs_alto)))
 
         self._precalcular()
@@ -322,9 +322,10 @@ class InterfazAEstrella:
                  font=fuente(24, "bold")).pack(side="left")
         tk.Label(titulo, text=" A* ", bg=AZUL, fg=TEXTO_CLARO,
                  font=fuente(16, "bold")).pack(side="left", padx=(int(S(10)), 0))
-        self.lbl_sub = tk.Label(izq, text="f(n) = g(n) + h(n)     h(n) = |x − 7| + |y − 7|  (Manhattan)",
+        self.lbl_sub = tk.Label(cab, text="f(n) = g(n) + h(n)     h(n) = |x − 7| + |y − 7|  (Manhattan)",
                                 bg=BG, fg=TENUE, font=fuente(13))
-        self.lbl_sub.pack(anchor="w", pady=(int(S(2)), int(S(8))))
+        self.lbl_sub.pack(side="left", padx=(int(S(18)), 0), pady=(int(S(6)), 0))
+        tk.Frame(izq, bg=BG, height=int(S(8))).pack()
 
         ancho = self.ox + 8 * (self.cs + self.gap) - self.gap + 12
         alto = self.oy + 8 * (self.cs + self.gap) - self.gap + 12
@@ -334,14 +335,14 @@ class InterfazAEstrella:
         marco_t.pack(anchor="n")
         self.cv = tk.Canvas(marco_t, width=ancho, height=alto, bg=FONDO_TABLERO,
                             highlightthickness=0)
-        self.cv.pack(padx=int(S(8)), pady=int(S(8)))
+        self.cv.pack(padx=int(S(4)), pady=int(S(4)))
         self._dibujar_tablero()
         self.cv.bind("<Motion>", self._hover)
         self.cv.bind("<Leave>", lambda e: self._mostrar_mensaje())
 
         self.tl = tk.Canvas(centro, width=ancho + S(16), height=S(30), bg=BG, highlightthickness=0,
                             cursor="hand2")
-        self.tl.pack(pady=(int(S(10)), int(S(2))))
+        self.tl.pack(pady=(int(S(6)), 0))
         self.tl.bind("<Button-1>", self._click_timeline)
         self.tl.bind("<B1-Motion>", self._click_timeline)
 
@@ -358,9 +359,10 @@ class InterfazAEstrella:
         self.btn_arbol.pack(side="right")
         velf = tk.Frame(ctrl, bg=BG)
         velf.pack(side="right", padx=10)
-        tk.Label(velf, text="VELOCIDAD", bg=BG, fg=TENUE, font=fuente(10, "bold")).pack()
+        tk.Label(velf, text="VELOCIDAD", bg=BG, fg=TENUE, font=fuente(10, "bold")).pack(side="left",
+                                                                                        padx=(0, 6))
         fila_v = tk.Frame(velf, bg=BG)
-        fila_v.pack()
+        fila_v.pack(side="left")
         menos = Boton(fila_v, "−", lambda: self._vel_paso(-1))
         menos.config(font=fuente(12, "bold"), pady=0, padx=int(S(8)))
         menos.pack(side="left")
@@ -528,12 +530,12 @@ class InterfazAEstrella:
                 d["flash"] = cv.create_polygon(self._rr(x1, y1, x2, y2, r), smooth=True, fill="",
                                                outline=ROJO, width=S(3), state="hidden", tags=("flash",))
                 etiqueta = {"B": "B · 1", "S": "S · 1"}.get(v, f"c={v}")
-                d["t_coste"] = cv.create_text(x1 + 5, y1 + 4, text=etiqueta, anchor="nw",
-                                              font=fuente_px(max(S(9), cs * 0.16), "bold"), tags=("texto",))
-                d["t_gh"] = cv.create_text((x1 + x2) / 2, y1 + cs * 0.55, text="",
-                                           font=fuente_px(max(S(9), cs * 0.155)), tags=("texto",))
+                d["t_coste"] = cv.create_text(x1 + 6, y1 + 4, text=etiqueta, anchor="nw",
+                                              font=fuente_px(max(S(10), cs * 0.175), "bold"), tags=("texto",))
+                d["t_gh"] = cv.create_text((x1 + x2) / 2, y1 + cs * 0.54, text="",
+                                           font=fuente_px(max(S(10), cs * 0.175), "bold"), tags=("texto",))
                 d["t_f"] = cv.create_text((x1 + x2) / 2, y1 + cs * 0.80, text="",
-                                          font=fuente_px(max(S(11), cs * 0.22), "bold"), tags=("texto",))
+                                          font=fuente_px(max(S(12), cs * 0.26), "bold"), tags=("texto",))
                 bw, bh = cs * 0.42, cs * 0.25
                 d["b_rect"] = cv.create_polygon(self._rr(x2 - bw - 3, y1 + 3, x2 - 3, y1 + 3 + bh, 5),
                                                 smooth=True, fill=PIZARRA, outline="",
@@ -568,7 +570,7 @@ class InterfazAEstrella:
         tinta = TEXTO_OSCURO if luminancia(fill) > 0.55 else TEXTO_CLARO
         cv.itemconfig(d["t_coste"], fill=mezclar(fill, tinta, 0.62))
         if info:
-            cv.itemconfig(d["t_gh"], text=f"g={formato_num(info['g'])}  h={info['h']}",
+            cv.itemconfig(d["t_gh"], text=f"g={formato_num(info['g'])} h={info['h']}",
                           fill=mezclar(fill, tinta, 0.85 * alfa))
             cv.itemconfig(d["t_f"], text=f"f={formato_num(info['f'])}", fill=mezclar(fill, tinta, alfa))
         else:
