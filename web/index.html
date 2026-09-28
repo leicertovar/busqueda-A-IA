@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A* · Rescate post-terremoto</title>
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<!-- Dibujos de cada elemento del tablero (viewBox 100 x 100) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="defs">
+    <symbol id="ico-bombero" viewBox="0 0 100 100">
+      <path d="M18 100 Q18 76 50 74 Q82 76 82 100Z" fill="#1e3a5f"/>
+      <rect x="18" y="89" width="64" height="5" fill="#facc15"/>
+      <rect x="47" y="76" width="6" height="24" fill="#facc15"/>
+      <circle cx="50" cy="59" r="17" fill="#f3c6a0"/>
+      <circle cx="44" cy="61" r="2.3" fill="#1f2937"/>
+      <circle cx="56" cy="61" r="2.3" fill="#1f2937"/>
+      <path d="M44 67 Q50 72 56 67" stroke="#7c2d12" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M29 51 Q29 21 50 19 Q71 21 71 51Z" fill="#dc2626"/>
+      <path d="M50 20 V50" stroke="#b91c1c" stroke-width="3"/>
+      <path d="M14 53 Q50 43 86 53 L86 58 Q50 48 14 58Z" fill="#991b1b"/>
+      <path d="M44 27 H56 V36 L50 41 L44 36Z" fill="#facc15" stroke="#a16207" stroke-width="1.2"/>
+    </symbol>
+
+    <symbol id="ico-superviviente" viewBox="0 0 100 100">
+      <path d="M30 100 L32 72 Q34 58 50 58 Q66 58 68 72 L70 100Z" fill="#2563eb"/>
+      <circle cx="42" cy="80" r="3" fill="#94a3b8" opacity=".7"/>
+      <circle cx="58" cy="90" r="4" fill="#94a3b8" opacity=".6"/>
+      <path d="M36 66 L25 86" stroke="#f3c6a0" stroke-width="7" stroke-linecap="round"/>
+      <path d="M63 64 L78 40" stroke="#f3c6a0" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="80" cy="36" r="6.5" fill="#f3c6a0"/>
+      <path d="M88 22 Q93 26 92 33 M84 17 Q92 20 95 28" stroke="#f8fafc" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="50" cy="40" r="14" fill="#f3c6a0"/>
+      <path d="M36 38 Q37 24 50 25 Q63 24 64 38 Q57 31 50 32 Q42 31 36 38Z" fill="#5b3a1e"/>
+      <circle cx="45" cy="41" r="2" fill="#1f2937"/>
+      <circle cx="55" cy="41" r="2" fill="#1f2937"/>
+      <ellipse cx="50" cy="48" rx="3" ry="2.6" fill="#7c2d12"/>
+      <rect x="38" y="30" width="9" height="4" rx="1" fill="#f8fafc" transform="rotate(-20 42 32)"/>
+    </symbol>
+
+    <symbol id="ico-escombros" viewBox="0 0 100 100">
+      <path d="M6 90 L22 64 L40 70 L52 52 L72 60 L94 90Z" fill="#a8a29e"/>
+      <path d="M22 64 L40 70 L34 90 L6 90Z" fill="#78716c"/>
+      <path d="M52 52 L72 60 L64 90 L44 90Z" fill="#8a817c"/>
+      <rect x="56" y="38" width="22" height="11" rx="1.5" fill="#b45309" transform="rotate(-18 67 43)"/>
+      <path d="M60 41 L62 47 M68 39 L70 45" stroke="#7c2d12" stroke-width="1.5" transform="rotate(-18 67 43)"/>
+      <rect x="16" y="50" width="18" height="9" rx="1.5" fill="#c2410c" transform="rotate(12 25 54)"/>
+      <circle cx="82" cy="82" r="5" fill="#57534e"/>
+      <circle cx="28" cy="84" r="3.5" fill="#57534e"/>
+      <circle cx="50" cy="86" r="2.5" fill="#57534e"/>
+    </symbol>
+
+    <symbol id="ico-grietas" viewBox="0 0 100 100">
+      <path d="M8 92 L28 76 L22 64 L42 56 L36 46 L54 38" stroke="#431407" stroke-width="4.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M28 76 L42 82 M42 56 L52 62" stroke="#431407" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <g fill="#64748b" opacity=".8">
+        <circle cx="62" cy="36" r="12"/>
+        <circle cx="76" cy="28" r="15"/>
+        <circle cx="70" cy="15" r="10"/>
+        <circle cx="87" cy="40" r="9"/>
+      </g>
+      <g fill="#94a3b8" opacity=".55">
+        <circle cx="73" cy="24" r="7"/>
+        <circle cx="62" cy="33" r="5"/>
+      </g>
+    </symbol>
+
+    <symbol id="ico-fuego" viewBox="0 0 100 100">
+      <path d="M50 10 C62 28 74 38 72 58 C71 74 62 84 50 84 C36 84 27 74 28 60 C29 48 36 44 38 33 C44 41 44 47 48 50 C50 38 46 26 50 10Z" fill="#ef4444"/>
+      <path d="M50 36 C58 48 64 55 62 66 C61 76 56 82 50 82 C43 82 38 76 39 68 C40 60 46 58 47 50 C50 56 52 50 50 36Z" fill="#f97316"/>
+      <path d="M50 57 C55 63 57 68 56 73 C55 78 53 80 50 80 C46 80 44 77 44 73 C44 68 48 65 50 57Z" fill="#fde047"/>
+      <path d="M0 92 Q10 85 20 92 T40 92 T60 92 T80 92 T100 92 V100 H0Z" fill="#3b82f6" opacity=".85"/>
+    </symbol>
+
+    <symbol id="ico-bloqueado" viewBox="0 0 100 100">
+      <path d="M4 72 L62 30 L70 41 L12 83Z" fill="#475569"/>
+      <path d="M30 92 L90 50 L97 61 L37 100Z" fill="#334155"/>
+      <path d="M62 30 L74 17 M66 36 L80 25 M70 41 L84 33" stroke="#b45309" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M24 10 L43 44 H5Z" fill="#facc15" stroke="#1f2937" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="22.5" y="21" width="3" height="12" rx="1" fill="#1f2937"/>
+      <circle cx="24" cy="38.5" r="2" fill="#1f2937"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <!-- ============ IZQUIERDA (60 %): tablero ============ -->
+  <section class="izq">
+    <header class="cab">
+      <h1>Rescate post-terremoto <span class="chip-a">A*</span></h1>
+      <p id="sub" class="sub">f(n) = g(n) + h(n) &nbsp;·&nbsp; h(n) = |x − 7| + |y − 7| (Manhattan)</p>
+    </header>
+
+    <div class="zona" id="zona">
+      <div class="marco" id="marco">
+        <div class="etq-col" id="etqCol"></div>
+        <div class="etq-fil" id="etqFil"></div>
+        <div class="tablero" id="tablero">
+          <svg class="capa" id="capa" viewBox="0 0 8 8" preserveAspectRatio="none">
+            <g id="gArbol"></g>
+            <g id="gRuta"></g>
+            <g id="gHaz"></g>
+          </svg>
+          <div class="selector" id="selector"></div>
+          <div class="ficha" id="ficha"><svg viewBox="0 0 100 100"><use href="#ico-bombero"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pie" id="pie">
+      <div class="linea" id="linea">
+        <div class="pista"><div class="progreso" id="progreso"></div><div id="puntos"></div><div class="perilla" id="perilla"></div></div>
+      </div>
+      <div class="controles">
+        <button class="btn" id="bIni" title="Inicio (Inicio)">«</button>
+        <button class="btn" id="bAnt" title="Anterior (←)">‹</button>
+        <button class="btn acento play" id="bPlay" title="Reproducir / pausa (espacio)">▶ Reproducir</button>
+        <button class="btn" id="bSig" title="Siguiente (→)">›</button>
+        <button class="btn" id="bFin" title="Final (Fin)">»</button>
+        <div class="esp"></div>
+        <div class="vel">
+          <small>VELOCIDAD</small>
+          <button class="btn mini" id="vMenos" title="Más lento (−)">−</button>
+          <span id="vLbl">1×</span>
+          <button class="btn mini" id="vMas" title="Más rápido (+)">+</button>
+        </div>
+        <button class="btn" id="bArbol" title="Mostrar árbol de búsqueda (A)">Árbol: sí</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DERECHA (40 %): variables ============ -->
+  <aside class="der">
+    <div class="stats">
+      <div class="stat" style="--c:var(--magenta)"><small>ITERACIÓN</small><b id="s-it">0</b></div>
+      <div class="stat" style="--c:var(--azul-claro)"><small>CREADOS</small><b id="s-cre">0</b></div>
+      <div class="stat" style="--c:var(--verde)"><small>EXPANDIDOS</small><b id="s-exp">0</b></div>
+      <div class="stat" style="--c:var(--azul)"><small>ABIERTA</small><b id="s-ab">0</b></div>
+      <div class="stat" style="--c:var(--pizarra)"><small>CERRADA</small><b id="s-ce">0</b></div>
+      <div class="stat" style="--c:var(--ambar)" title="Veces que se encontró un camino más barato a un nodo de la lista abierta"><small>MEJORAS g</small><b id="s-act">0</b></div>
+    </div>
+
+    <div class="card">
+      <h2>NODO EXTRAÍDO <span class="tenue">(menor f)</span></h2>
+      <div class="nodo"><span id="nPos">—</span><div id="nVals"></div></div>
+    </div>
+
+    <div class="card">
+      <h2>VECINOS EVALUADOS</h2>
+      <table class="vec"><tbody id="vecinos"></tbody></table>
+    </div>
+
+    <div class="card abierta-card">
+      <h2>LISTA ABIERTA <span class="tenue">f → h → antigüedad</span>
+        <span class="marcas"><i style="color:var(--magenta)">● siguiente</i><i style="color:var(--azul-claro)">● nuevo</i><i style="color:var(--ambar)">● mejorado</i></span>
+      </h2>
+      <div class="scroll">
+        <table class="lista">
+          <thead><tr><th>Nodo</th><th>g(n)</th><th>h(n)</th><th>f(n)</th><th>Padre</th></tr></thead>
+          <tbody id="tAbierta"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>LISTA CERRADA <span class="tenue">(orden de expansión)</span></h2>
+      <div class="chips" id="cerrada"></div>
+    </div>
+
+    <div class="leyenda">
+      <span><i class="t-1"></i>1 Libre</span>
+      <span><i class="t-2"><svg><use href="#ico-escombros"/></svg></i>2 Escombros</span>
+      <span><i class="t-4"><svg><use href="#ico-grietas"/></svg></i>4 Grietas / Humo</span>
+      <span><i class="t-7"><svg><use href="#ico-fuego"/></svg></i>7 Fuego / Agua</span>
+      <span><i class="t-X"><svg><use href="#ico-bloqueado"/></svg></i>Bloqueado</span>
+      <span><i class="t-B"><svg><use href="#ico-bombero"/></svg></i>Bombero</span>
+      <span><i class="t-S"><svg><use href="#ico-superviviente"/></svg></i>Superviviente</span>
+      <span><i class="l-abierta"></i>Abierta</span>
+      <span><i class="l-cerrada"></i>Cerrada</span>
+      <span><i class="l-actual"></i>Actual</span>
+      <span><i class="l-ruta"></i>Ruta</span>
+    </div>
+  </aside>
+</div>
+
+<footer class="estado" id="estado"></footer>
+
+<script src="datos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
