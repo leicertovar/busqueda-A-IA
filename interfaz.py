@@ -218,10 +218,14 @@ class InterfazAEstrella:
         self.root.configure(bg=BG)
         ESCALA = max(1.0, self.root.winfo_fpixels("1i") / 96.0)
 
+        sw = self.root.winfo_screenwidth()
         sh = self.root.winfo_screenheight()
         self.gap = round(S(4))
-        self.cs = int(max(S(46), min(S(84), (sh - S(330)) / 8 - self.gap)))  # celda adaptable
         self.ox, self.oy = S(28), S(24)
+        # el tablero debe caber en el 60 % del ancho y en el alto disponible
+        cs_ancho = (sw * 0.60 - S(60) - self.ox) / 8 - self.gap
+        cs_alto = (sh - S(320) - self.oy) / 8 - self.gap
+        self.cs = int(max(S(46), min(cs_ancho, cs_alto)))
 
         self._precalcular()
         self._estilos()
@@ -301,38 +305,48 @@ class InterfazAEstrella:
 
     def _construir(self):
         raiz = tk.Frame(self.root, bg=BG)
-        raiz.pack(fill="both", expand=True, padx=16, pady=(10, 6))
+        raiz.pack(fill="both", expand=True, padx=int(S(18)), pady=(int(S(12)), int(S(6))))
+        raiz.grid_columnconfigure(0, weight=3, uniform="col")   # 60 %
+        raiz.grid_columnconfigure(1, weight=2, uniform="col")   # 40 %
+        raiz.grid_rowconfigure(0, weight=1)
 
-        # ---------------- columna izquierda: encabezado + tablero + controles
+        # ---------------- columna izquierda (60 %): encabezado + tablero + controles
         izq = tk.Frame(raiz, bg=BG)
-        izq.pack(side="left", fill="y")
+        izq.grid(row=0, column=0, sticky="nsew")
 
         cab = tk.Frame(izq, bg=BG)
         cab.pack(fill="x")
-        tk.Label(cab, text="Rescate post-terremoto  ·  A*", bg=BG, fg=TEXTO,
-                 font=fuente(22, "bold")).pack(anchor="w")
-        self.lbl_sub = tk.Label(cab, text="f(n) = g(n) + h(n)     h(n) = |x − 7| + |y − 7|  (Manhattan)",
+        titulo = tk.Frame(cab, bg=BG)
+        titulo.pack(side="left")
+        tk.Label(titulo, text="Rescate post-terremoto", bg=BG, fg=TEXTO,
+                 font=fuente(24, "bold")).pack(side="left")
+        tk.Label(titulo, text=" A* ", bg=AZUL, fg=TEXTO_CLARO,
+                 font=fuente(16, "bold")).pack(side="left", padx=(int(S(10)), 0))
+        self.lbl_sub = tk.Label(izq, text="f(n) = g(n) + h(n)     h(n) = |x − 7| + |y − 7|  (Manhattan)",
                                 bg=BG, fg=TENUE, font=fuente(13))
-        self.lbl_sub.pack(anchor="w", pady=(0, 6))
+        self.lbl_sub.pack(anchor="w", pady=(int(S(2)), int(S(8))))
 
         ancho = self.ox + 8 * (self.cs + self.gap) - self.gap + 12
         alto = self.oy + 8 * (self.cs + self.gap) - self.gap + 12
-        marco_t = tk.Frame(izq, bg=FONDO_TABLERO, highlightthickness=1, highlightbackground=BORDE)
-        marco_t.pack()
+        centro = tk.Frame(izq, bg=BG)
+        centro.pack(fill="both", expand=True)
+        marco_t = tk.Frame(centro, bg=FONDO_TABLERO, highlightthickness=1, highlightbackground=BORDE)
+        marco_t.pack(anchor="n")
         self.cv = tk.Canvas(marco_t, width=ancho, height=alto, bg=FONDO_TABLERO,
                             highlightthickness=0)
-        self.cv.pack(padx=6, pady=6)
+        self.cv.pack(padx=int(S(8)), pady=int(S(8)))
         self._dibujar_tablero()
         self.cv.bind("<Motion>", self._hover)
         self.cv.bind("<Leave>", lambda e: self._mostrar_mensaje())
 
-        self.tl = tk.Canvas(izq, width=ancho + S(12), height=S(30), bg=BG, highlightthickness=0)
-        self.tl.pack(pady=(8, 2))
+        self.tl = tk.Canvas(centro, width=ancho + S(16), height=S(30), bg=BG, highlightthickness=0,
+                            cursor="hand2")
+        self.tl.pack(pady=(int(S(10)), int(S(2))))
         self.tl.bind("<Button-1>", self._click_timeline)
         self.tl.bind("<B1-Motion>", self._click_timeline)
 
-        ctrl = tk.Frame(izq, bg=BG)
-        ctrl.pack(fill="x", pady=(2, 0))
+        ctrl = tk.Frame(centro, bg=BG, width=ancho + S(16))
+        ctrl.pack(pady=(int(S(2)), 0))
         Boton(ctrl, "«", lambda: (self.pausar(), self.ir(0))).pack(side="left", padx=(0, 4))
         Boton(ctrl, "‹", self.anterior).pack(side="left", padx=4)
         self.btn_play = Boton(ctrl, "Reproducir", self.alternar, ancho=10, acento=True)
@@ -359,52 +373,53 @@ class InterfazAEstrella:
 
         # ---------------- columna derecha: variables del algoritmo
         der = tk.Frame(raiz, bg=BG)
-        der.pack(side="left", fill="both", expand=True, padx=(18, 0))
+        der.grid(row=0, column=1, sticky="nsew", padx=(int(S(18)), 0))
 
-        # tarjetas de contadores
+        # tarjetas de contadores (3 x 2, compactas)
         stats = tk.Frame(der, bg=BG)
         stats.pack(fill="x")
         self.stats = {}
-        defs = [("it", "ITERACIÓN", MAGENTA), ("cre", "NODOS CREADOS", AZUL_CLARO),
-                ("exp", "NODOS EXPANDIDOS", VERDE), ("ab", "LISTA ABIERTA", AZUL),
-                ("ce", "LISTA CERRADA", PIZARRA), ("act", "MEJORAS DE g", AMBAR)]
+        defs = [("it", "ITERACIÓN", MAGENTA), ("cre", "CREADOS", AZUL_CLARO),
+                ("exp", "EXPANDIDOS", VERDE), ("ab", "ABIERTA", AZUL),
+                ("ce", "CERRADA", PIZARRA), ("act", "MEJORAS g", AMBAR)]
         for k, (clave, titulo, color) in enumerate(defs):
             t = tk.Frame(stats, bg=CARD, highlightthickness=1, highlightbackground=BORDE)
-            t.grid(row=k // 3, column=k % 3, sticky="nsew", padx=(0 if k % 3 == 0 else 8, 0),
-                   pady=(0, 8))
-            tk.Frame(t, bg=color, width=int(S(4))).pack(side="left", fill="y")
+            t.grid(row=k // 3, column=k % 3, sticky="nsew",
+                   padx=(0 if k % 3 == 0 else int(S(6)), 0), pady=(0, int(S(6))))
+            tk.Frame(t, bg=color, height=int(S(3))).pack(side="top", fill="x")
             cuerpo = tk.Frame(t, bg=CARD)
-            cuerpo.pack(side="left", fill="both", expand=True, padx=10, pady=5)
+            cuerpo.pack(fill="both", expand=True, padx=int(S(10)), pady=(int(S(4)), int(S(6))))
             tk.Label(cuerpo, text=titulo, bg=CARD, fg=TENUE, font=fuente(10, "bold"),
                      anchor="w").pack(fill="x")
-            lbl = tk.Label(cuerpo, text="0", bg=CARD, fg=TEXTO, font=fuente(24, "bold"), anchor="w")
+            lbl = tk.Label(cuerpo, text="0", bg=CARD, fg=color, font=fuente(22, "bold"), anchor="w")
             lbl.pack(fill="x")
             self.stats[clave] = {"lbl": lbl, "val": 0.0}
         for c in range(3):
             stats.grid_columnconfigure(c, weight=1, uniform="s")
 
-        # nodo actual + vecinos
-        fila = tk.Frame(der, bg=BG)
-        fila.pack(fill="x")
-        nodo = self._tarjeta(fila, "NODO EXTRAÍDO (MENOR f)", side="left", fill="both")
-        self.lbl_pos = tk.Label(nodo, text="—", bg=CARD, fg=MAGENTA, font=fuente(30, "bold"),
-                                width=6, anchor="w")
-        self.lbl_pos.pack(fill="x", padx=12)
-        self.lbl_gh = tk.Label(nodo, text="", bg=CARD, fg=TEXTO, font=("Consolas", 11), anchor="w",
+        # nodo actual
+        nodo = self._tarjeta(der, "NODO EXTRAÍDO  (menor f)", fill="x", pady=(int(S(2)), 0))
+        fila_n = tk.Frame(nodo, bg=CARD)
+        fila_n.pack(fill="x", padx=12, pady=(0, 8))
+        self.lbl_pos = tk.Label(fila_n, text="—", bg=CARD, fg=MAGENTA, font=fuente(28, "bold"),
+                                anchor="w")
+        self.lbl_pos.pack(side="left")
+        self.lbl_gh = tk.Label(fila_n, text="", bg=CARD, fg=TEXTO, font=("Consolas", 11), anchor="w",
                                justify="left")
-        self.lbl_gh.pack(fill="x", padx=12, pady=(0, 10))
+        self.lbl_gh.pack(side="left", padx=(int(S(16)), 0))
 
-        vec = self._tarjeta(fila, "VECINOS EVALUADOS  (arriba · abajo · izquierda · derecha)",
-                            side="left", fill="both", expand=True, padx=(8, 0))
+        # vecinos
+        vec = self._tarjeta(der, "VECINOS EVALUADOS", fill="x", pady=(int(S(8)), 0))
         cuerpo = tk.Frame(vec, bg=CARD)
-        cuerpo.pack(fill="both", expand=True, padx=12, pady=(2, 8))
+        cuerpo.pack(fill="x", padx=12, pady=(2, 8))
+        cuerpo.grid_columnconfigure(4, weight=1)
         self.filas_vec = []
         for r in range(4):
             celdas = []
             for cidx, (w, anc) in enumerate([(9, "w"), (6, "w"), (5, "w"), (6, "w"), (11, "center")]):
                 lb = tk.Label(cuerpo, text="", bg=CARD, fg=TEXTO, width=w, anchor=anc,
                               font=("Consolas", 10) if cidx < 4 else fuente(10, "bold"))
-                lb.grid(row=r, column=cidx, sticky="w", pady=1, padx=(0, 4))
+                lb.grid(row=r, column=cidx, sticky="we" if cidx == 4 else "w", pady=1, padx=(0, 4))
                 celdas.append(lb)
             self.filas_vec.append(celdas)
 
@@ -413,10 +428,10 @@ class InterfazAEstrella:
         cab_ab = tk.Frame(ab, bg=CARD)
         cab_ab.pack(fill="x", padx=12, pady=(8, 4))
         tk.Label(cab_ab, text="LISTA ABIERTA", bg=CARD, fg=TENUE, font=fuente(11, "bold")).pack(side="left")
-        tk.Label(cab_ab, text="  ordenada por f → h → antigüedad   ", bg=CARD, fg="#5d7090",
-                 font=fuente(11)).pack(side="left")
-        for texto, col in [("● siguiente", MAGENTA), ("● nuevo", AZUL_CLARO), ("● mejorado", AMBAR)]:
-            tk.Label(cab_ab, text=texto, bg=CARD, fg=col, font=fuente(11)).pack(side="right", padx=(8, 0))
+        tk.Label(cab_ab, text="  f → h → antigüedad", bg=CARD, fg="#5d7090",
+                 font=fuente(10)).pack(side="left")
+        for texto, col in [("● mejorado", AMBAR), ("● nuevo", AZUL_CLARO), ("● siguiente", MAGENTA)]:
+            tk.Label(cab_ab, text=texto, bg=CARD, fg=col, font=fuente(10)).pack(side="right", padx=(6, 0))
         cont = tk.Frame(ab, bg=CARD)
         cont.pack(fill="both", expand=True, padx=12, pady=(0, 10))
         self.tree = ttk.Treeview(cont, columns=("n", "g", "h", "f", "p"), show="headings",
@@ -442,25 +457,36 @@ class InterfazAEstrella:
         self.cv_cerr.bind("<Configure>", lambda e: self._dibujar_cerrada(self.i))
 
         # leyenda
-        ley = tk.Canvas(der, height=S(24), bg=BG, highlightthickness=0)
+        ley = tk.Canvas(der, height=S(48), bg=BG, highlightthickness=0)
         ley.pack(fill="x", pady=(8, 0))
-        x = 2
-        for col, txt, tipo in [(TERRENO[1], "1 Libre", "f"), (TERRENO[2], "2 Escombros", "f"),
-                               (TERRENO[4], "4 Grietas/Humo", "f"), (TERRENO[7], "7 Fuego/Agua", "f"),
-                               ("#1e293b", "X Bloqueado", "f"), (AZUL, "Abierta", "o"),
-                               (TINTA_CERRADA, "Cerrada", "f"), (MAGENTA, "Actual", "o"),
-                               (VERDE, "Ruta", "f")]:
-            if tipo == "f":
-                ley.create_rectangle(x, S(6), x + S(13), S(19), fill=col, outline="")
-            else:
-                ley.create_rectangle(x + S(1), S(7), x + S(12), S(18), outline=col, width=S(2))
-            t = ley.create_text(x + S(18), S(12), text=txt, anchor="w", fill=TENUE, font=fuente(11))
-            x = ley.bbox(t)[2] + S(12)
+        items = [(TERRENO[1], "1 Libre", "f"), (TERRENO[2], "2 Escombros", "f"),
+                 (TERRENO[4], "4 Grietas/Humo", "f"), (TERRENO[7], "7 Fuego/Agua", "f"),
+                 ("#1e293b", "X Bloqueado", "f"), (AZUL, "Abierta", "o"),
+                 (TINTA_CERRADA, "Cerrada", "f"), (MAGENTA, "Actual", "o"), (VERDE, "Ruta", "f")]
+
+        def dibujar_leyenda(ev=None):
+            ley.delete("all")
+            limite = max(ley.winfo_width(), 200)
+            x, y = 2, S(12)
+            for col, txt, tipo in items:
+                t = ley.create_text(x + S(18), y, text=txt, anchor="w", fill=TENUE, font=fuente(11))
+                x2 = ley.bbox(t)[2]
+                if x2 > limite and x > 2:       # salto de línea
+                    ley.delete(t)
+                    x, y = 2, y + S(22)
+                    t = ley.create_text(x + S(18), y, text=txt, anchor="w", fill=TENUE, font=fuente(11))
+                    x2 = ley.bbox(t)[2]
+                if tipo == "f":
+                    ley.create_rectangle(x, y - S(6), x + S(13), y + S(7), fill=col, outline="")
+                else:
+                    ley.create_rectangle(x + S(1), y - S(5), x + S(12), y + S(6), outline=col, width=S(2))
+                x = x2 + S(12)
+        ley.bind("<Configure>", dibujar_leyenda)
 
         # barra de estado
         self.lbl_msg = tk.Label(self.root, text="", bg=PANEL, fg=TENUE, font=fuente(12),
                                 anchor="w", padx=int(S(16)), pady=int(S(5)))
-        self.lbl_msg.pack(side="bottom", fill="x")
+        self.lbl_msg.pack(side="bottom", fill="x", before=raiz)
 
         for tecla, fn in [("<Right>", self.siguiente), ("<Left>", self.anterior),
                           ("<space>", self.alternar), ("<Home>", lambda: self.ir(0)),
