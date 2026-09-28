@@ -8,9 +8,9 @@
 </head>
 <body>
 
-<!-- Dibujos de cada elemento del tablero (viewBox 100 x 100) -->
+<!-- Dibujos (viewBox 100 x 100 salvo que se indique) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs id="defs">
+  <defs>
     <symbol id="ico-bombero" viewBox="0 0 100 100">
       <path d="M18 100 Q18 76 50 74 Q82 76 82 100Z" fill="#1e3a5f"/>
       <rect x="18" y="89" width="64" height="5" fill="#facc15"/>
@@ -57,15 +57,9 @@
       <path d="M8 92 L28 76 L22 64 L42 56 L36 46 L54 38" stroke="#431407" stroke-width="4.5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
       <path d="M28 76 L42 82 M42 56 L52 62" stroke="#431407" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       <g fill="#64748b" opacity=".8">
-        <circle cx="62" cy="36" r="12"/>
-        <circle cx="76" cy="28" r="15"/>
-        <circle cx="70" cy="15" r="10"/>
-        <circle cx="87" cy="40" r="9"/>
+        <circle cx="62" cy="36" r="12"/><circle cx="76" cy="28" r="15"/><circle cx="70" cy="15" r="10"/><circle cx="87" cy="40" r="9"/>
       </g>
-      <g fill="#94a3b8" opacity=".55">
-        <circle cx="73" cy="24" r="7"/>
-        <circle cx="62" cy="33" r="5"/>
-      </g>
+      <g fill="#94a3b8" opacity=".55"><circle cx="73" cy="24" r="7"/><circle cx="62" cy="33" r="5"/></g>
     </symbol>
 
     <symbol id="ico-fuego" viewBox="0 0 100 100">
@@ -83,31 +77,123 @@
       <rect x="22.5" y="21" width="3" height="12" rx="1" fill="#1f2937"/>
       <circle cx="24" cy="38.5" r="2" fill="#1f2937"/>
     </symbol>
+
+    <symbol id="ico-tanque" viewBox="0 0 60 60">
+      <path d="M14 36 L9 60 M46 36 L51 60 M14 38 L48 58 M46 38 L12 58" stroke="#334155" stroke-width="2.5"/>
+      <rect x="9" y="10" width="42" height="28" rx="4" fill="#64748b"/>
+      <rect x="9" y="17" width="42" height="3" fill="#475569"/>
+      <rect x="9" y="29" width="42" height="3" fill="#475569"/>
+      <path d="M7 11 Q30 -3 53 11Z" fill="#475569"/>
+    </symbol>
+
+    <symbol id="ico-camion" viewBox="0 0 160 70">
+      <rect x="4" y="22" width="110" height="34" rx="4" fill="#dc2626"/>
+      <path d="M114 28 H138 L154 44 V56 H114Z" fill="#b91c1c"/>
+      <path d="M120 33 H136 L147 44 H120Z" fill="#bae6fd"/>
+      <rect x="4" y="15" width="100" height="6" fill="#9ca3af"/>
+      <path d="M12 15 V21 M24 15 V21 M36 15 V21 M48 15 V21 M60 15 V21 M72 15 V21 M84 15 V21 M96 15 V21" stroke="#6b7280" stroke-width="2"/>
+      <rect x="4" y="41" width="150" height="3" fill="#facc15"/>
+      <rect x="124" y="22" width="12" height="6" rx="2" fill="#3b82f6"/>
+      <circle cx="32" cy="57" r="10" fill="#111827"/><circle cx="32" cy="57" r="4" fill="#9ca3af"/>
+      <circle cx="130" cy="57" r="10" fill="#111827"/><circle cx="130" cy="57" r="4" fill="#9ca3af"/>
+    </symbol>
   </defs>
 </svg>
 
 <div class="app">
-  <!-- ============ IZQUIERDA (60 %): tablero ============ -->
+  <!-- ============ IZQUIERDA (60 %): escenario ============ -->
   <section class="izq">
     <header class="cab">
-      <h1>Rescate post-terremoto <span class="chip-a">A*</span></h1>
-      <p id="sub" class="sub">f(n) = g(n) + h(n) &nbsp;·&nbsp; h(n) = |x − 7| + |y − 7| (Manhattan)</p>
+      <div class="titulo">
+        <h1>Rescate post-terremoto <span class="chip-a">A*</span></h1>
+        <p id="sub" class="sub"></p>
+      </div>
+      <div class="herr">
+        <span class="marcador" id="marcador" hidden></span>
+        <button class="btn" id="bSonido" title="Activar / silenciar sonido (M)">♪ Sonido</button>
+        <button class="btn" id="bH" title="Ver h(n) en todas las casillas (H)">Mapa h(n)</button>
+        <button class="btn" id="bReto" title="Modo reto: adivina el siguiente nodo (R)">◎ Reto</button>
+        <button class="btn" id="bEditor" title="Editar el edificio (E)">✎ Editar</button>
+        <button class="btn" id="bAyuda" title="Ayuda">?</button>
+      </div>
     </header>
 
     <div class="zona" id="zona">
-      <div class="marco" id="marco">
-        <div class="etq-col" id="etqCol"></div>
-        <div class="etq-fil" id="etqFil"></div>
-        <div class="tablero" id="tablero">
-          <svg class="capa" id="capa" viewBox="0 0 8 8" preserveAspectRatio="none">
-            <g id="gArbol"></g>
-            <g id="gRuta"></g>
-            <g id="gHaz"></g>
-          </svg>
-          <div class="selector" id="selector"></div>
-          <div class="ficha" id="ficha"><svg viewBox="0 0 100 100"><use href="#ico-bombero"/></svg></div>
+      <div class="estrellas" id="estrellas"></div>
+      <div class="luna"></div>
+      <div class="polvo-amb" id="polvoAmb"></div>
+
+      <div class="escena" id="escena">
+        <div class="techo" id="techo">
+          <div class="antena"><i></i></div>
+          <svg class="tanque"><use href="#ico-tanque"/></svg>
+          <div class="helipuerto" id="helipuerto">H</div>
+          <div class="parapeto"><div class="etq-col" id="etqCol"></div></div>
         </div>
+
+        <div class="edificio" id="edificio">
+          <div class="tablero" id="tablero">
+            <svg class="capa" id="capa" viewBox="0 0 8 8" preserveAspectRatio="none">
+              <g id="gArbol"></g>
+              <g id="gHover"></g>
+              <g id="gRuta"></g>
+              <g id="gHaz"></g>
+            </svg>
+            <div class="selector" id="selector"></div>
+            <div class="ficha" id="ficha"><svg viewBox="0 0 100 100"><use href="#ico-bombero"/></svg></div>
+            <div class="flotantes" id="flotantes"></div>
+          </div>
+        </div>
+        <div class="etq-fil" id="etqFil"></div>
+
+        <div class="calle">
+          <svg class="camion"><use href="#ico-camion"/></svg>
+          <div class="ambulancia" id="ambulancia">
+            <svg viewBox="0 0 130 66">
+              <rect x="4" y="14" width="86" height="40" rx="5" fill="#f8fafc"/>
+              <path d="M90 22 H108 L124 38 V54 H90Z" fill="#e2e8f0"/>
+              <path d="M95 26 H106 L117 38 H95Z" fill="#bae6fd"/>
+              <rect x="4" y="40" width="120" height="4" fill="#ef4444"/>
+              <path d="M40 20 h8 v8 h8 v8 h-8 v8 h-8 v-8 h-8 v-8 h8z" fill="#ef4444"/>
+              <rect class="sirena s1" x="66" y="7" width="10" height="7" rx="2" fill="#ef4444"/>
+              <rect class="sirena s2" x="78" y="7" width="10" height="7" rx="2" fill="#3b82f6"/>
+              <circle cx="28" cy="55" r="9" fill="#111827"/><circle cx="28" cy="55" r="3.5" fill="#9ca3af"/>
+              <circle cx="104" cy="55" r="9" fill="#111827"/><circle cx="104" cy="55" r="3.5" fill="#9ca3af"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="cuerda" id="cuerda"></div>
+        <div class="helicoptero" id="helicoptero">
+          <svg viewBox="0 0 140 70">
+            <rect class="rotor" x="12" y="3" width="108" height="4" rx="2" fill="#cbd5e1"/>
+            <rect x="62" y="6" width="6" height="10" fill="#475569"/>
+            <path d="M32 31 H4 V25 L9 25 L12 29 H32Z" fill="#b91c1c"/>
+            <circle class="rotor-cola" cx="7" cy="23" r="7" fill="none" stroke="#cbd5e1" stroke-width="2"/>
+            <path d="M40 16 Q90 12 98 34 Q98 48 78 50 H46 Q30 50 30 36 Q30 20 40 16Z" fill="#dc2626"/>
+            <path d="M78 20 Q94 22 96 34 H78Z" fill="#bae6fd"/>
+            <rect x="46" y="30" width="20" height="3" fill="#facc15"/>
+            <path d="M40 58 H94 M52 50 V58 M84 50 V58" stroke="#334155" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="burbuja" id="burbuja">¡Auxilio!</div>
+        <div class="fx" id="fx"></div>
       </div>
+    </div>
+
+    <div class="editor-barra" id="editorBarra">
+      <span class="eb-titulo">PINCEL</span>
+      <button class="pincel" data-v="1" title="Tecla 1"><i class="t-1"></i>Libre</button>
+      <button class="pincel" data-v="2" title="Tecla 2"><i class="t-2"><svg><use href="#ico-escombros"/></svg></i>Escombros</button>
+      <button class="pincel" data-v="4" title="Tecla 4"><i class="t-4"><svg><use href="#ico-grietas"/></svg></i>Grietas</button>
+      <button class="pincel" data-v="7" title="Tecla 7"><i class="t-7"><svg><use href="#ico-fuego"/></svg></i>Fuego</button>
+      <button class="pincel" data-v="X" title="Tecla X"><i class="t-X"><svg><use href="#ico-bloqueado"/></svg></i>Muro</button>
+      <button class="pincel" data-v="B" title="Tecla B"><i class="t-B"><svg><use href="#ico-bombero"/></svg></i>Bombero</button>
+      <button class="pincel" data-v="S" title="Tecla S"><i class="t-S"><svg><use href="#ico-superviviente"/></svg></i>Superviviente</button>
+      <div class="esp"></div>
+      <button class="btn" id="bAleatorio">Aleatorio</button>
+      <button class="btn" id="bOriginal">Original</button>
+      <button class="btn acento" id="bListo">✔ Listo</button>
     </div>
 
     <div class="pie" id="pie">
@@ -143,13 +229,22 @@
       <div class="stat" style="--c:var(--ambar)" title="Veces que se encontró un camino más barato a un nodo de la lista abierta"><small>MEJORAS g</small><b id="s-act">0</b></div>
     </div>
 
-    <div class="card">
-      <h2>NODO EXTRAÍDO <span class="tenue">(menor f)</span></h2>
-      <div class="nodo"><span id="nPos">—</span><div id="nVals"></div></div>
+    <div class="card narr">
+      <h2>¿QUÉ ESTÁ PASANDO?</h2>
+      <div class="narr-cab">
+        <span id="nPos">—</span>
+        <div class="ecuacion">
+          <span class="eq" style="--c:var(--magenta)"><small>f(n)</small><b id="eqF">0</b></span><i>=</i>
+          <span class="eq" style="--c:var(--ambar)"><small>g(n)</small><b id="eqG">0</b></span><i>+</i>
+          <span class="eq" style="--c:var(--cian)"><small>h(n)</small><b id="eqH">0</b></span>
+        </div>
+      </div>
+      <p class="narr-txt" id="narr"></p>
+      <p class="reto-msg" id="retoMsg" hidden></p>
     </div>
 
     <div class="card">
-      <h2>VECINOS EVALUADOS</h2>
+      <h2>VECINOS EVALUADOS <span class="tenue">g = g(padre) + coste de entrar</span></h2>
       <table class="vec"><tbody id="vecinos"></tbody></table>
     </div>
 
@@ -175,20 +270,56 @@
       <span><i class="t-2"><svg><use href="#ico-escombros"/></svg></i>2 Escombros</span>
       <span><i class="t-4"><svg><use href="#ico-grietas"/></svg></i>4 Grietas / Humo</span>
       <span><i class="t-7"><svg><use href="#ico-fuego"/></svg></i>7 Fuego / Agua</span>
-      <span><i class="t-X"><svg><use href="#ico-bloqueado"/></svg></i>Bloqueado</span>
-      <span><i class="t-B"><svg><use href="#ico-bombero"/></svg></i>Bombero</span>
-      <span><i class="t-S"><svg><use href="#ico-superviviente"/></svg></i>Superviviente</span>
+      <span><i class="t-X"><svg><use href="#ico-bloqueado"/></svg></i>Derrumbe</span>
       <span><i class="l-abierta"></i>Abierta</span>
       <span><i class="l-cerrada"></i>Cerrada</span>
       <span><i class="l-actual"></i>Actual</span>
       <span><i class="l-ruta"></i>Ruta</span>
+      <span><b class="l-linea" style="--c:var(--cian)"></b>h: distancia Manhattan</span>
+      <span><b class="l-linea" style="--c:var(--ambar)"></b>g: camino recorrido</span>
     </div>
   </aside>
 </div>
 
 <footer class="estado" id="estado"></footer>
+<div class="tip" id="tip" hidden></div>
+
+<!-- ============ Pantalla de inicio ============ -->
+<div class="intro" id="intro">
+  <div class="intro-card">
+    <button class="cerrar-x" id="iCerrar" title="Cerrar" hidden>×</button>
+    <div class="intro-arte">
+      <svg class="a1"><use href="#ico-bombero"/></svg>
+      <svg class="a2"><use href="#ico-escombros"/></svg>
+      <svg class="a3"><use href="#ico-fuego"/></svg>
+      <svg class="a4"><use href="#ico-superviviente"/></svg>
+    </div>
+    <h2>Misión: rescate post-terremoto</h2>
+    <p>Un terremoto ha dañado el edificio: hay escombros, grietas, humo, fuego y zonas derrumbadas.
+       Un superviviente espera en <b id="iMeta">(7,7)</b> y el bombero entra por <b id="iInicio">(0,0)</b>.</p>
+    <p>El bombero usa el algoritmo <b>A*</b>. En cada paso explora la casilla con menor
+       <b class="cf">f(n)</b> = <b class="cg">g(n)</b> + <b class="ch">h(n)</b>:
+       <b class="cg">g</b> es lo que ya le costó llegar y <b class="ch">h</b> una estimación optimista de lo que le falta
+       (distancia Manhattan).</p>
+    <div class="atajos">
+      <span><kbd>←</kbd><kbd>→</kbd> pasos</span>
+      <span><kbd>Espacio</kbd> reproducir</span>
+      <span><kbd>H</kbd> mapa h(n)</span>
+      <span><kbd>R</kbd> reto</span>
+      <span><kbd>E</kbd> editar</span>
+      <span><kbd>M</kbd> sonido</span>
+    </div>
+    <div class="intro-botones">
+      <button class="btn acento grande" id="iComenzar">▶ Comenzar misión</button>
+      <button class="btn grande" id="iReto">◎ Jugar en modo reto</button>
+    </div>
+    <small class="consejo">Consejo: pasa el ratón por cualquier casilla para ver cómo se calculan su g(n) y su h(n).</small>
+  </div>
+</div>
 
 <script src="datos.js"></script>
+<script src="astar.js"></script>
+<script src="sonido.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
