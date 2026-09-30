@@ -558,51 +558,85 @@ def generar_informe(res: Resultado, res_h0: Resultado | None = None, carpeta="re
             "hacia el superviviente y evita expandir casillas que no pueden formar parte de una ruta mejor.")]
 
     # ----------------------------------------------------------- 8
+    mono = lambda t: f"<font face='Mono'>{t}</font>"
     H += [PageBreak(), P("8. Implementación en Python y visualización", "h1"),
           P("El proyecto está implementado en Python 3 con las bibliotecas matplotlib (gráficos y visor "
-            "interactivo), Pillow (animación GIF) y reportlab (este informe)."),
+            "interactivo), Pillow (animación GIF) y reportlab (este informe). La interfaz web se sirve con el "
+            f"módulo estándar {mono('http.server')}, sin dependencias adicionales."),
           tabla([["Archivo", "Contenido"],
                  ["astar_rescate.py", "Matriz 8×8 del enunciado, costes, Distancia de Manhattan, algoritmo A* "
                                       "con lista abierta y cerrada, reconstrucción del camino, registro de la "
                                       "traza por iteración y verificación de admisibilidad/consistencia."],
-                 ["interfaz.py", "Interfaz gráfica animada (Tkinter) para recorrer la búsqueda paso a paso, "
-                                 "con animación en cada celda y todas las variables del algoritmo."],
+                 ["servidor.py", "Servidor local de la interfaz web. Ejecuta A* en Python y entrega la traza a "
+                                 "la página: /api/datos (tablero del enunciado), /api/astar (tablero editado) "
+                                 "y /api/aleatorio (edificio aleatorio con solución)."],
+                 ["web/", "Interfaz web (index.html, estilos.css, app.js, sonido.js). Solo dibuja y anima la "
+                          "traza calculada por Python; no contiene ninguna implementación de A*."],
+                 ["interfaz.py", "Interfaz gráfica animada de escritorio (Tkinter) para recorrer la búsqueda "
+                                 "paso a paso."],
                  ["visualizacion.py", "Dibujo del tablero, ruta óptima, espacio de búsqueda, imagen por "
                                       "iteración, animación GIF y visor clásico (matplotlib)."],
-                 ["generar_informe.py", "Genera este informe PDF a partir de los resultados reales."],
-                 ["main.py", "Programa principal: ejecuta todo y abre la interfaz animada."]],
+                 ["generar_informe.py", "Genera las figuras y este informe PDF a partir de los resultados "
+                                        "reales. Se ejecuta aparte: el programa principal no genera el PDF."],
+                 ["main.py", "Programa principal: ejecuta A*, muestra y guarda la traza y abre la interfaz "
+                             "web en el navegador."]],
                 [4 * cm, ancho_util - 4 * cm], tam=9),
           Spacer(1, 8),
           P("<b>Ejecución:</b>"),
-          P("pip install matplotlib pillow reportlab<br/>"
-            "python main.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# todo + interfaz animada<br/>"
-            "python main.py --sin-visor &nbsp;# solo genera resultados e informe<br/>"
-            "python main.py --solo-visor # solo abre la interfaz animada", "codigo"),
-          P("<b>Resultados generados en la carpeta <font face='Mono'>resultados/</font>:</b>"),
-          V("<font face='Mono'>traza_astar.txt</font>: traza completa en texto (cada iteración con el nodo "
-            "extraído, la evaluación de sus vecinos, lista abierta, lista cerrada y contadores)."),
-          V("<font face='Mono'>01_tablero_inicial.png</font>, <font face='Mono'>02_ruta_optima.png</font>, "
-            "<font face='Mono'>03_espacio_busqueda.png</font>, <font face='Mono'>04_comparacion_h0.png</font>, "
-            "<font face='Mono'>05_admisibilidad_heuristica.png</font>."),
-          V("<font face='Mono'>iteraciones/iteracion_XX.png</font>: una imagen por iteración con el tablero y "
-            "todas las variables importantes."),
-          V("<font face='Mono'>animacion_astar.gif</font>: animación de la búsqueda completa."),
-          P("<b>Interfaz animada.</b> Muestra a la izquierda el tablero y a la derecha las variables del "
-            "algoritmo. En cada iteración: (1) un selector magenta se desliza hasta el nodo de menor f extraído de "
-            "la lista abierta; (2) la celda cambia de color al entrar en la lista cerrada y recibe su número de "
-            "orden #k; (3) se lanzan haces hacia los 4 vecinos y cada celda reacciona según el resultado: azul = "
-            "nuevo nodo creado en la lista abierta, ámbar = mejora de g, rojo = casilla bloqueada X, gris = ya "
-            "estaba en la lista cerrada. Los contadores de nodos creados y expandidos, el tamaño de ambas listas, "
-            "la tabla de la lista abierta ordenada por f y la lista cerrada se actualizan con animación. Al "
-            "extraer la meta, el bombero recorre la ruta óptima y las celdas se tiñen de verde. Se controla con "
-            "botones, una línea de tiempo, velocidad ajustable y teclado (← →, espacio, Inicio, Fin)."),
+          P("pip install -r requirements.txt<br/>"
+            "python main.py &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            "# traza + interfaz web (http://127.0.0.1:8000/)<br/>"
+            "python main.py --resultados # además figuras, iteraciones y GIF<br/>"
+            "python main.py --tk &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;# interfaz de escritorio (Tkinter)<br/>"
+            "python main.py --visor-clasico # visor de matplotlib<br/>"
+            "python generar_informe.py &nbsp;&nbsp;# figuras + este informe PDF", "codigo"),
+          P(f"<b>Resultados generados en la carpeta {mono('resultados/')}:</b>"),
+          V(f"{mono('traza_astar.txt')}: traza completa en texto (cada iteración con el nodo extraído, la "
+            "evaluación de sus vecinos, lista abierta, lista cerrada y contadores). Se genera en cada ejecución."),
+          V(f"{mono('01_tablero_inicial.png')}, {mono('02_ruta_optima.png')}, {mono('03_espacio_busqueda.png')}, "
+            f"{mono('04_comparacion_h0.png')}, {mono('05_admisibilidad_heuristica.png')}, "
+            f"{mono('iteraciones/iteracion_XX.png')} (una imagen por iteración) y {mono('animacion_astar.gif')}: "
+            f"se generan con {mono('--resultados')} o con {mono('generar_informe.py')}."),
+          V(f"{mono('Informe_Proyecto_AStar.pdf')}: este informe, generado con {mono('generar_informe.py')}."),
+
+          P("8.1 Interfaz web", "h2"),
+          P(f"Al ejecutar {mono('python main.py')} se inicia el servidor local y se abre el navegador. Python "
+            "calcula A* y la página recibe la traza completa en formato JSON, por lo que la interfaz muestra "
+            "exactamente los mismos valores que la consola y este informe. A la izquierda se ve el edificio (el "
+            "tablero) y a la derecha las variables del algoritmo: contadores de iteración, nodos creados y "
+            "expandidos, tamaño de las listas y mejoras de g; la ecuación f(n) = g(n) + h(n) del nodo actual con "
+            "una explicación en texto; la tabla de vecinos evaluados; la lista abierta ordenada por f, h y "
+            "antigüedad; y la lista cerrada en orden de expansión."),
+          P("Al pulsar <b>Reproducir</b> por primera vez, un terremoto sacude el edificio y un helicóptero deja "
+            "al bombero en la casilla de inicio; después la búsqueda avanza sola. En cada iteración un selector "
+            "magenta marca el nodo extraído de la lista abierta, la celda pasa a la lista cerrada con su número "
+            "de orden #k y se lanzan haces hacia los 4 vecinos: azul = nuevo en la lista abierta, ámbar = mejora "
+            "de g, rojo = casilla bloqueada X, gris = ya en la lista cerrada o sin mejora. Al extraer la meta, el "
+            "bombero recorre la ruta óptima y las celdas se tiñen de verde. Pasar el ratón sobre una casilla "
+            "muestra su coste y el cálculo de g, h y f. Se controla con botones, una línea de tiempo, velocidad "
+            "ajustable y teclado (flechas izquierda y derecha, espacio, Inicio, Fin, + y −, A árbol, E editar, M sonido)."),
+          P("El modo <b>Editar</b> permite pintar muros, terrenos, el bombero y el superviviente, o generar un "
+            "edificio aleatorio; cada cambio se envía a Python, que vuelve a ejecutar A* y devuelve la nueva traza."),
+          *([imagen(img("interfaz_web_13.png"), ancho_util / cm),
+             P("Figura 7. Interfaz web en la iteración 13: se expande (5,2) con f = 16; (6,2) y (5,3) entran en "
+               "la lista abierta, (4,2) ya estaba cerrada y (5,1) está bloqueada.", "pie")]
+            if os.path.exists(img("interfaz_web_13.png")) else []),
+          *([imagen(img("interfaz_web_21.png"), ancho_util / cm),
+             P(f"Figura 8. Interfaz web en la última iteración ({res.iteraciones}): la meta (7,7) sale de la "
+               f"lista abierta y se dibuja la ruta óptima de coste {formato_num(res.coste)}.", "pie")]
+            if os.path.exists(img("interfaz_web_21.png")) else []),
+
+          P("8.2 Interfaz de escritorio y figuras", "h2"),
+          P(f"La interfaz de escritorio ({mono('python main.py --tk')}) muestra la misma información con "
+            f"Tkinter y las mismas animaciones de selector, haces y ruta. Además, {mono('visualizacion.py')} "
+            "genera una imagen estática por iteración."),
           *([imagen(img("interfaz_animada.png"), ancho_util / cm),
-             P("Figura 7. Interfaz animada durante la iteración 13: evaluación de los vecinos de (5,2) "
+             P("Figura 9. Interfaz de escritorio durante la iteración 13: evaluación de los vecinos de (5,2) "
                "(gris = ya en lista cerrada, azul = nuevo en lista abierta) y listas abierta y cerrada.", "pie")]
             if os.path.exists(img("interfaz_animada.png")) else []),
           imagen(img_it(res.iteraciones), ancho_util / cm),
-          P(f"Figura 8. Última iteración ({res.iteraciones}): la meta (7,7) se extrae de la lista abierta y se "
-            "dibuja la ruta óptima.", "pie")]
+          P(f"Figura 10. Última iteración ({res.iteraciones}) generada por visualizacion.py: la meta (7,7) se "
+            "extrae de la lista abierta y se dibuja la ruta óptima.", "pie")]
 
     # ----------------------------------------------------------- 9
     H += [P("9. Conclusiones", "h1"),
