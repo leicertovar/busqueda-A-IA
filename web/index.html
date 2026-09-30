@@ -109,12 +109,8 @@
         <p id="sub" class="sub"></p>
       </div>
       <div class="herr">
-        <span class="marcador" id="marcador" hidden></span>
         <button class="btn" id="bSonido" title="Activar / silenciar sonido (M)">♪ Sonido</button>
-        <button class="btn" id="bH" title="Ver h(n) en todas las casillas (H)">Mapa h(n)</button>
-        <button class="btn" id="bReto" title="Modo reto: adivina el siguiente nodo (R)">◎ Reto</button>
         <button class="btn" id="bEditor" title="Editar el edificio (E)">✎ Editar</button>
-        <button class="btn" id="bAyuda" title="Ayuda">?</button>
       </div>
     </header>
 
@@ -240,7 +236,6 @@
         </div>
       </div>
       <p class="narr-txt" id="narr"></p>
-      <p class="reto-msg" id="retoMsg" hidden></p>
     </div>
 
     <div class="card">
@@ -284,41 +279,6 @@
 <footer class="estado" id="estado"></footer>
 <div class="tip" id="tip" hidden></div>
 
-<!-- ============ Pantalla de inicio ============ -->
-<div class="intro" id="intro">
-  <div class="intro-card">
-    <button class="cerrar-x" id="iCerrar" title="Cerrar" hidden>×</button>
-    <div class="intro-arte">
-      <svg class="a1"><use href="#ico-bombero"/></svg>
-      <svg class="a2"><use href="#ico-escombros"/></svg>
-      <svg class="a3"><use href="#ico-fuego"/></svg>
-      <svg class="a4"><use href="#ico-superviviente"/></svg>
-    </div>
-    <h2>Misión: rescate post-terremoto</h2>
-    <p>Un terremoto ha dañado el edificio: hay escombros, grietas, humo, fuego y zonas derrumbadas.
-       Un superviviente espera en <b id="iMeta">(7,7)</b> y el bombero entra por <b id="iInicio">(0,0)</b>.</p>
-    <p>El bombero usa el algoritmo <b>A*</b>. En cada paso explora la casilla con menor
-       <b class="cf">f(n)</b> = <b class="cg">g(n)</b> + <b class="ch">h(n)</b>:
-       <b class="cg">g</b> es lo que ya le costó llegar y <b class="ch">h</b> una estimación optimista de lo que le falta
-       (distancia Manhattan).</p>
-    <div class="atajos">
-      <span><kbd>←</kbd><kbd>→</kbd> pasos</span>
-      <span><kbd>Espacio</kbd> reproducir</span>
-      <span><kbd>H</kbd> mapa h(n)</span>
-      <span><kbd>R</kbd> reto</span>
-      <span><kbd>E</kbd> editar</span>
-      <span><kbd>M</kbd> sonido</span>
-    </div>
-    <div class="intro-botones">
-      <button class="btn acento grande" id="iComenzar">▶ Comenzar misión</button>
-      <button class="btn grande" id="iReto">◎ Jugar en modo reto</button>
-    </div>
-    <small class="consejo">Consejo: pasa el ratón por cualquier casilla para ver cómo se calculan su g(n) y su h(n).</small>
-  </div>
-</div>
-
-<script src="datos.js"></script>
-<script src="astar.js"></script>
 <script src="sonido.js"></script>
 <script src="app.js"></script>
 </body>

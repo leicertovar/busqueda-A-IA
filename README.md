@@ -8,20 +8,24 @@ usando `f(n) = g(n) + h(n)` y la **Distancia de Manhattan** como heurística.
 ### Instalación y ejecución
 ```bash
 pip install -r requirements.txt
-python main.py                # ejecuta A*, genera figuras, GIF, informe PDF y abre el visor
-python main.py --sin-visor    # solo genera los resultados y el informe
-python main.py --solo-visor   # solo abre el visor interactivo paso a paso
+python main.py                # ejecuta A*, guarda la traza y abre la interfaz web en el navegador
+python main.py --resultados   # además genera figuras, imágenes por iteración y GIF (sin PDF)
+python main.py --tk           # interfaz de escritorio (Tkinter) en lugar de la web
+python main.py --visor-clasico  # visor de matplotlib en lugar de la web
 ```
+La interfaz web la sirve `servidor.py` en `http://127.0.0.1:8000/` (Ctrl+C para detener).
+Python calcula A* y la página solo lo dibuja, también al editar el edificio o generar uno aleatorio.
 
 ### Archivos
 | Archivo | Contenido |
 |---|---|
 | `astar_rescate.py` | Matriz y costes del enunciado, heurística Manhattan, algoritmo A* (lista abierta / cerrada), traza por iteración, verificación de admisibilidad y consistencia |
+| `servidor.py` | Servidor local de la interfaz web y API (`/api/datos`, `/api/astar`, `/api/aleatorio`) |
+| `web/` | Interfaz web (HTML, CSS, animaciones y sonido) |
 | `interfaz.py` | Interfaz gráfica animada (Tkinter) para recorrer la búsqueda paso a paso |
 | `visualizacion.py` | Tablero, ruta óptima, espacio de búsqueda, una imagen por iteración, GIF y visor clásico |
-| `generar_informe.py` | Informe PDF (editar aquí `INTEGRANTES` y `DOCENTE`) |
+| `generar_informe.py` | Informe PDF (ya no se genera al ejecutar; `python generar_informe.py` si se necesita) |
 | `main.py` | Programa principal |
-| `GUION_VIDEO.md` | Propuesta de guion para el video (≤ 10 min, 4 integrantes) |
 
 ### Resultados (`resultados/`)
 - `Informe_Proyecto_AStar.pdf` – informe completo (rúbrica 1)

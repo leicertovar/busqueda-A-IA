@@ -1,10 +1,12 @@
 "use strict";
 
-const D0 = window.DATOS;
-if (!D0) {
-  document.body.innerHTML =
-    "<p style='padding:2em;font-size:18px'>No se encontró <b>datos.js</b>. Ejecuta <code>python main.py --web</code>.</p>";
-  throw new Error("Falta datos.js");
+// Los datos los calcula Python (servidor.py): la página no ejecuta A* por su cuenta.
+let D0;
+async function api(ruta, cuerpo) {
+  const r = await fetch(ruta, cuerpo === undefined ? {} :
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
+  if (!r.ok) throw new Error(`${ruta}: ${r.status}`);
+  return r.json();
 }
 
 const NS = "http://www.w3.org/2000/svg";
@@ -27,12 +29,11 @@ const FRASES = ["¡Auxilio!", "¡Estoy aquí!", "¡Ayuda!", "¿Hay alguien?", "�
 
 // ------------------------------------------------------------------ estado
 let DAT, T, TOTAL, TAB, META, INICIO, E, celdas = {};
-let i = 0, vel = 1, jugando = false, arbol = true, verH = false;
+let i = 0, vel = 1, jugando = false, arbol = true, heliVisto = false;
 let cs = 80;
 const G = { et: 20, muro: 10, techo: 50, calle: 44 };
 let tPlay = null, gen = 0, anims = [], pendientes = [];
 let introActiva = false, hoverPos = null;
-const reto = { activo: false, esperando: false, puntos: 0, racha: 0, aciertos: 0, preguntas: 0 };
 const editor = { activo: false, pincel: "X", pintando: false, ultima: null };
 
 function precalcular(traza) {
@@ -130,24 +131,21 @@ function construirCeldas() {
   const tb = $("tablero");
   tb.querySelectorAll(".celda").forEach((n) => n.remove());
   celdas = {};
-  const hMax = Math.max(...TAB.flatMap((r, f) => r.map((_, c) => Math.abs(f - META[0]) + Math.abs(c - META[1]))), 1);
   for (let f = 0; f < 8; f++) {
     for (let c = 0; c < 8; c++) {
       const v = TAB[f][c];
-      const h = Math.abs(f - META[0]) + Math.abs(c - META[1]);
       const el = document.createElement("div");
       el.className = `celda t-${v}`;
-      el.style.setProperty("--hq", (h / hMax).toFixed(3));
       const ico = ICONO[v] ? `<svg class="ico" viewBox="0 0 100 100"><use href="#ico-${ICONO[v]}"/></svg>` : "";
       const brasas = v === 7
         ? [0, 1, 2].map(() => `<span class="brasa" style="left:${azar(25, 70).toFixed(0)}%;animation-delay:${(-azar(0, 2.2)).toFixed(2)}s"></span>`).join("")
         : "";
       const etiqueta = v === "B" ? "B · 1" : v === "S" ? "S · 1" : `c=${v}`;
       el.innerHTML =
-        `<div class="caja"><div class="calor"></div><div class="suelo"></div>${ico}${brasas}` +
+        `<div class="caja"><div class="suelo"></div>${ico}${brasas}` +
         `<div class="tinte"></div><div class="verde"></div>` +
         (v === "X" ? "" :
-          `<span class="coste">${etiqueta}</span><span class="orden"></span><span class="hmap">h=${h}</span>` +
+          `<span class="coste">${etiqueta}</span><span class="orden"></span>` +
           `<div class="valores"><span class="gh"></span><span class="fv"></span></div>`) +
         `</div><div class="anillo"></div><div class="destello"></div>`;
       tb.insertBefore(el, $("capa"));
@@ -181,8 +179,6 @@ function cargar(datos) {
   i = 0;
   construirCeldas();
   construirPuntos();
-  $("iMeta").textContent = fpos(META);
-  $("iInicio").textContent = fpos(INICIO);
 }
 
 // ------------------------------------------------------------------ render estático
@@ -201,7 +197,6 @@ function render(idx, conPanel = true) {
   const camino = new Set(final ? DAT.camino.map(k) : []);
 
   for (const [kk, c] of Object.entries(celdas)) {
-    c.el.classList.remove("candidata");
     if (c.v === "X") continue;
     const n = est[kk];
     c.el.classList.toggle("conocida", !!n);
@@ -342,7 +337,7 @@ function panel(idx, animar = false, retrasos = []) {
   $("eqG").textContent = n ? fmt(n.g) : "–";
   $("eqH").textContent = n ? n.h : "–";
   $("eqF").textContent = n ? fmt(n.f) : "–";
-  if (!reto.esperando) $("narr").innerHTML = narrar(idx);
+  $("narr").innerHTML = narrar(idx);
   if (animar) {
     A(nPos, [{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], 0.4);
     document.querySelectorAll(".eq").forEach((q, j) =>
@@ -530,7 +525,7 @@ function decir(texto, dur = 2200) {
 }
 
 function ambiente() {
-  if (introActiva || editor.activo || document.hidden || !$("intro").hidden) return;
+  if (introActiva || editor.activo || document.hidden) return;
   if (i === TOTAL && DAT.encontrado) return;
   if (Math.random() < 0.35) return;
   decir(FRASES[Math.floor(Math.random() * FRASES.length)]);
@@ -600,7 +595,6 @@ function paso() {
   let fin = ini + e.vecinos.length * esc + 0.5;
   if (e.es_meta) fin = animarRuta(0.6);
   else if (i === TOTAL) sonar(fin, Sonido.incorrecto);
-  if (i === TOTAL && reto.activo) despues(fin, resumenReto);
   return fin;
 }
 
@@ -639,8 +633,8 @@ function animarRuta(t) {
 }
 
 // ------------------------------------------------------------------ introducción (terremoto + helicóptero)
+// Devuelve la duración (s) de la animación.
 function intro() {
-  pausar();
   cortar();
   i = 0;
   render(0);
@@ -704,6 +698,7 @@ function intro() {
     introActiva = false;
     decir("¡Auxilio!", 2600);
   });
+  return 5;
 }
 
 // ------------------------------------------------------------------ hover didáctico
@@ -776,99 +771,6 @@ function celdaDe(ev) {
   return f < 0 || f > 7 || c < 0 || c > 7 ? null : [f, c];
 }
 
-// ------------------------------------------------------------------ modo reto
-function actualizarMarcador() {
-  const m = $("marcador");
-  m.hidden = !reto.activo;
-  m.textContent = `◎ ${reto.puntos} pts · racha ${reto.racha} · ${reto.aciertos}/${reto.preguntas}`;
-  $("bReto").classList.toggle("on", reto.activo);
-}
-
-function alternarReto(forzar) {
-  reto.activo = forzar ?? !reto.activo;
-  Object.assign(reto, { esperando: false, puntos: 0, racha: 0, aciertos: 0, preguntas: 0 });
-  if (editor.activo) alternarEditor();
-  pausar();
-  const msg = $("retoMsg");
-  if (reto.activo) {
-    if (i >= TOTAL) ir(0); else ir(i);
-    msg.className = "reto-msg";
-    msg.innerHTML = "<b>Modo reto activado.</b> Antes de cada paso tendrás que adivinar qué nodo sacará A* de la lista abierta. " +
-                    "Pulsa <b>›</b> para la primera pregunta.";
-    msg.hidden = false;
-  } else {
-    msg.hidden = true;
-    ir(i);
-  }
-  actualizarMarcador();
-}
-
-function preguntar() {
-  if (i >= TOTAL) return;
-  cortar();
-  render(i);
-  reto.esperando = true;
-  T[i].abierta.forEach((n) => celdas[k(n.pos)].el.classList.add("candidata"));
-  $("narr").innerHTML = "<b>¿Qué nodo sacará A* de la lista abierta ahora?</b> Haz clic en una de las casillas amarillas. " +
-                        "<i>Pista: el de menor <span class=\"cf\">f</span>; si empatan, el de menor <span class=\"ch\">h</span>; " +
-                        "si siguen empatados, el que entró antes en la lista.</i>";
-  A($("narr"), [{ opacity: 0 }, { opacity: 1 }], 0.3);
-  mensaje("Reto: elige la casilla que A* expandirá en el siguiente paso");
-  Sonido.pregunta();
-}
-
-function responder(p) {
-  const cand = T[i].abierta;
-  const elegido = cand.find((n) => k(n.pos) === k(p));
-  if (!elegido) {
-    sacudir(celdas[k(p)].caja);
-    Sonido.incorrecto();
-    mensaje("Esa casilla no está en la lista abierta: elige una de las marcadas en amarillo");
-    return;
-  }
-  const correcto = T[i + 1].actual;
-  reto.esperando = false;
-  reto.preguntas++;
-  document.querySelectorAll(".candidata").forEach((n) => n.classList.remove("candidata"));
-  const msg = $("retoMsg");
-  msg.hidden = false;
-  if (k(p) === k(correcto.pos)) {
-    reto.racha++;
-    reto.aciertos++;
-    const pts = 10 + (reto.racha - 1) * 2;
-    reto.puntos += pts;
-    Sonido.correcto();
-    flotar(p, `¡Correcto! +${pts}`, C.verde, 0, true);
-    const pe = enEscena(p);
-    particulas(pe.x, pe.y, 0, { n: 12, color: [C.verde, C.amarillo, C.azulClaro], radio: cs * 0.7, persistente: true });
-    msg.className = "reto-msg bien";
-    msg.innerHTML = `<b>¡Correcto!</b> ${fpos(correcto.pos)} tenía el menor f = ${fmt(correcto.f)}.` +
-                    (reto.racha > 1 ? ` Racha de <b>${reto.racha}</b>.` : "");
-  } else {
-    reto.racha = 0;
-    Sonido.incorrecto();
-    sacudir(celdas[k(p)].caja);
-    flotar(p, "✖", C.rojo, 0, true);
-    let razon;
-    if (elegido.f !== correcto.f) razon = `su f = ${fmt(correcto.f)} es menor que f = ${fmt(elegido.f)}`;
-    else if (elegido.h !== correcto.h) razon = `empatan en f = ${fmt(correcto.f)}, pero su h = ${correcto.h} es menor que h = ${elegido.h}`;
-    else razon = "empatan en f y en h, y entró antes en la lista abierta";
-    msg.className = "reto-msg malo";
-    msg.innerHTML = `Elegiste <b>${fpos(p)}</b>, pero A* saca <b>${fpos(correcto.pos)}</b>: ${razon}.`;
-  }
-  actualizarMarcador();
-  despues(0.9, paso);
-}
-
-function resumenReto() {
-  const msg = $("retoMsg");
-  msg.hidden = false;
-  msg.className = "reto-msg bien";
-  const pct = reto.preguntas ? Math.round((reto.aciertos / reto.preguntas) * 100) : 0;
-  msg.innerHTML = `<b>¡Reto completado!</b> ${reto.aciertos} de ${reto.preguntas} aciertos (${pct} %) · <b>${reto.puntos} puntos</b>. ` +
-                  (pct === 100 ? "¡Piensas exactamente como A*!" : pct >= 70 ? "¡Muy bien!" : "Repasa la regla: menor f, luego menor h.");
-}
-
 // ------------------------------------------------------------------ editor
 function alternarEditor() {
   editor.activo = !editor.activo;
@@ -876,14 +778,13 @@ function alternarEditor() {
   $("bEditor").classList.toggle("on", editor.activo);
   pausar();
   cortar();
-  reto.esperando = false;
   quitarHover();
   i = 0;
   render(0);
   if (editor.activo) {
     elegirPincel(editor.pincel);
     $("narr").innerHTML = "<b>Modo edición.</b> Elige un pincel y pinta sobre el edificio (puedes arrastrar). " +
-                          "El bombero y el superviviente se mueven al pintarlos. A* se recalcula en cada cambio.";
+                          "El bombero y el superviviente se mueven al pintarlos. Python recalcula A* en cada cambio.";
   }
 }
 
@@ -892,21 +793,24 @@ function elegirPincel(v) {
   document.querySelectorAll(".pincel").forEach((b) => b.classList.toggle("on", b.dataset.v === v));
 }
 
+// Las peticiones de pintado se encadenan para que las respuestas lleguen en orden.
+let colaPintado = Promise.resolve();
 function pintar(p) {
   const [f, c] = p;
   const v = editor.pincel === "X" || editor.pincel === "B" || editor.pincel === "S" ? editor.pincel : Number(editor.pincel);
   const actual = TAB[f][c];
   if (actual === v || actual === "B" || actual === "S") return;
-  const nuevo = TAB.map((r) => r.slice());
   if (v === "B" || v === "S") {
-    nuevo.forEach((r, ff) => r.forEach((x, cc) => { if (x === v) nuevo[ff][cc] = 1; }));
+    TAB.forEach((r, ff) => r.forEach((x, cc) => { if (x === v) TAB[ff][cc] = 1; }));
   }
-  nuevo[f][c] = v;
-  cargar(aEstrella(nuevo));
-  render(0);
-  const cel = celdas[k(p)];
-  cel.caja.animate([{ transform: "scale(.5)" }, { transform: "scale(1)" }], { duration: 300, easing: REBOTE });
-  Sonido.pintar();
+  TAB[f][c] = v;
+  const nuevo = TAB.map((r) => r.slice());
+  colaPintado = colaPintado.then(() => api("/api/astar", { tablero: nuevo })).then((res) => {
+    cargar(res);
+    render(0);
+    celdas[k(p)].caja.animate([{ transform: "scale(.5)" }, { transform: "scale(1)" }], { duration: 300, easing: REBOTE });
+    Sonido.pintar();
+  }).catch((err) => mensaje(`Error al recalcular A* en Python: ${err.message}`));
 }
 
 function aparecerTodo() {
@@ -917,42 +821,26 @@ function aparecerTodo() {
   });
 }
 
-function aleatorio() {
-  const r = () => Math.floor(Math.random() * 8);
-  for (let intento = 0; intento < 300; intento++) {
-    const t = Array.from({ length: 8 }, () => Array.from({ length: 8 }, () => {
-      const x = Math.random();
-      return x < 0.5 ? 1 : x < 0.64 ? 2 : x < 0.75 ? 4 : x < 0.83 ? 7 : "X";
-    }));
-    t[r() % 3][r()] = "B";
-    let s;
-    do { s = [5 + (r() % 3), r()]; } while (t[s[0]][s[1]] === "B");
-    t[s[0]][s[1]] = "S";
-    const res = aEstrella(t);
-    if (res.encontrado && res.camino.length > 9) {
-      cargar(res);
-      render(0);
-      aparecerTodo();
-      Sonido.derrumbe();
-      return;
-    }
+async function aleatorio() {
+  try {
+    cargar(await api("/api/aleatorio"));
+    render(0);
+    aparecerTodo();
+    Sonido.derrumbe();
+  } catch (err) {
+    mensaje(`Error al generar el edificio en Python: ${err.message}`);
   }
 }
 
 // ------------------------------------------------------------------ navegación
 function ir(n) {
   cortar();
-  reto.esperando = false;
   i = Math.max(0, Math.min(TOTAL, n));
   render(i);
 }
 function siguiente() {
   if (editor.activo) return;
   pausar();
-  if (reto.activo) {
-    if (!reto.esperando && i < TOTAL) preguntar();
-    return;
-  }
   paso();
 }
 function anterior() { pausar(); ir(i - 1); }
@@ -964,11 +852,16 @@ function pausar() {
 }
 function alternar() {
   if (editor.activo) return;
-  if (reto.activo) return siguiente();
   if (jugando) return pausar();
   jugando = true;
   $("bPlay").textContent = "❚❚ Pausa";
   if (i >= TOTAL) ir(0);
+  // La primera reproducción desde el inicio arranca con el terremoto y el helicóptero.
+  if (i === 0 && !heliVisto) {
+    heliVisto = true;
+    tPlay = setTimeout(jugar, ms(intro()));
+    return;
+  }
   jugar();
 }
 function jugar() {
@@ -989,29 +882,10 @@ function alternarArbol() {
   $("bArbol").textContent = `Árbol: ${arbol ? "sí" : "no"}`;
   dibujarArbol(E[i]);
 }
-function alternarH() {
-  verH = !verH;
-  $("tablero").classList.toggle("ver-h", verH);
-  $("bH").classList.toggle("on", verH);
-  Sonido.tick();
-}
 function alternarSonido() {
   const on = Sonido.alternar();
   $("bSonido").textContent = on ? "♪ Sonido" : "♪ Silencio";
   $("bSonido").classList.toggle("on", on);
-}
-
-function mostrarIntro(conCerrar) {
-  pausar();
-  $("iCerrar").hidden = !conCerrar;
-  $("intro").hidden = false;
-}
-function empezar(conReto) {
-  Sonido.iniciar();
-  $("intro").hidden = true;
-  if (editor.activo) alternarEditor();
-  if (conReto !== reto.activo) alternarReto(conReto);
-  intro();
 }
 
 // ------------------------------------------------------------------ tamaño
@@ -1038,14 +912,8 @@ function enlazar() {
   clic("vMenos", () => cambiarVel(-1));
   clic("vMas", () => cambiarVel(1));
   clic("bArbol", alternarArbol);
-  clic("bH", alternarH);
-  clic("bReto", () => alternarReto());
   clic("bEditor", alternarEditor);
   clic("bSonido", alternarSonido);
-  clic("bAyuda", () => mostrarIntro(true));
-  clic("iComenzar", () => empezar(false));
-  clic("iReto", () => empezar(true));
-  clic("iCerrar", () => { $("intro").hidden = true; });
   clic("bListo", alternarEditor);
   clic("bOriginal", () => { cargar(D0); render(0); aparecerTodo(); });
   clic("bAleatorio", aleatorio);
@@ -1064,14 +932,10 @@ function enlazar() {
   tb.addEventListener("pointerdown", (ev) => {
     Sonido.iniciar();
     const p = celdaDe(ev);
-    if (!p) return;
-    if (editor.activo) {
-      editor.pintando = true;
-      editor.ultima = k(p);
-      pintar(p);
-    } else if (reto.esperando) {
-      responder(p);
-    }
+    if (!p || !editor.activo) return;
+    editor.pintando = true;
+    editor.ultima = k(p);
+    pintar(p);
   });
   tb.addEventListener("pointermove", (ev) => {
     const p = celdaDe(ev);
@@ -1090,11 +954,6 @@ function enlazar() {
   addEventListener("pointerup", () => { editor.pintando = false; });
 
   document.addEventListener("keydown", (ev) => {
-    if (!$("intro").hidden) {
-      if (ev.key === "Enter") empezar(false);
-      if (ev.key === "Escape" && !$("iCerrar").hidden) $("intro").hidden = true;
-      return;
-    }
     if (editor.activo) {
       const pinceles = { 1: "1", 2: "2", 4: "4", 7: "7", x: "X", b: "B", s: "S" };
       const pk = pinceles[ev.key.toLowerCase()];
@@ -1106,7 +965,7 @@ function enlazar() {
       ArrowRight: siguiente, ArrowLeft: anterior, " ": alternar,
       Home: () => { pausar(); ir(0); }, End: () => { pausar(); ir(TOTAL); },
       "+": () => cambiarVel(1), "-": () => cambiarVel(-1),
-      a: alternarArbol, h: alternarH, r: () => alternarReto(), e: alternarEditor, m: alternarSonido,
+      a: alternarArbol, e: alternarEditor, m: alternarSonido,
     };
     const fn = acciones[ev.key.length === 1 ? ev.key.toLowerCase() : ev.key];
     if (fn) {
@@ -1121,14 +980,20 @@ function enlazar() {
 }
 
 // ------------------------------------------------------------------ arranque
-construirFijo();
-cargar(D0);
-enlazar();
-$("bSonido").classList.toggle("on", Sonido.activo);
-$("bSonido").textContent = Sonido.activo ? "♪ Sonido" : "♪ Silencio";
-const inicial = parseInt(location.hash.slice(1), 10);
-if (inicial >= 0 && inicial <= TOTAL) {
-  i = inicial;
-  $("intro").hidden = true;
-}
-ajustar();
+(async () => {
+  try {
+    D0 = await api("/api/datos");
+  } catch {
+    document.body.innerHTML =
+      "<p style='padding:2em;font-size:18px'>No se pudo conectar con Python. Inicia el proyecto con <code>python main.py</code>.</p>";
+    return;
+  }
+  construirFijo();
+  cargar(D0);
+  enlazar();
+  $("bSonido").classList.toggle("on", Sonido.activo);
+  $("bSonido").textContent = Sonido.activo ? "♪ Sonido" : "♪ Silencio";
+  const inicial = parseInt(location.hash.slice(1), 10);
+  if (inicial >= 0 && inicial <= TOTAL) i = inicial;
+  ajustar();
+})();
