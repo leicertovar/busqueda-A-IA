@@ -7,6 +7,7 @@ Uso:
     python main.py --sin-visor     -> igual, pero sin abrir la ventana interactiva
     python main.py --solo-visor    -> solo abre la interfaz animada paso a paso
     python main.py --visor-clasico -> usa el visor de matplotlib en lugar de la interfaz animada
+    python main.py --web           -> abre la interfaz web (web/index.html) en el navegador
 """
 
 import argparse
@@ -27,9 +28,20 @@ def main():
     p.add_argument("--solo-visor", action="store_true", help="solo abrir el visor interactivo")
     p.add_argument("--visor-clasico", action="store_true",
                    help="usar el visor de matplotlib en lugar de la interfaz animada")
+    p.add_argument("--web", action="store_true",
+                   help="exportar la traza y abrir la interfaz web en el navegador")
     args = p.parse_args()
 
     resultado = a_estrella()
+
+    if args.web:
+        import pathlib
+        import webbrowser
+        from exportar_web import exportar
+        ruta = exportar(resultado)
+        print(f"Abriendo interfaz web: {ruta}")
+        webbrowser.open(pathlib.Path(ruta).as_uri())
+        return
 
     if not args.solo_visor:
         import matplotlib
